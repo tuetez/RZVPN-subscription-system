@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت RZVPN</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ background:#070b13;
+ color:#fff;
+ font-family:Tahoma,Arial,sans-serif;
+}
+
+.container{
+ width:min(1100px,94%);
+ margin:30px auto;
+}
+
+.header{
+ background:#111827;
+ border:1px solid #263449;
+ border-radius:22px;
+ padding:22px;
+ margin-bottom:20px;
+}
+
+.logo{
+ font-size:30px;
+ font-weight:900;
+}
+
+.muted{
+ color:#94a3b8;
+ margin-top:6px;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+ gap:18px;
+}
+
+.card{
+ background:#111827;
+ border:1px solid #263449;
+ border-radius:20px;
+ padding:20px;
+}
+
+h2{
+ margin-top:0;
+}
+
+input,textarea{
+ width:100%;
+ background:#0b1220;
+ color:white;
+ border:1px solid #334155;
+ border-radius:12px;
+ padding:13px;
+ margin:7px 0;
+ font-family:inherit;
+}
+
+textarea{
+ min-height:90px;
+ resize:vertical;
+}
+
+button{
+ border:0;
+ border-radius:12px;
+ padding:12px 15px;
+ cursor:pointer;
+ font-family:inherit;
+ font-weight:900;
+ margin:4px;
+ background:#2563eb;
+ color:#fff;
+}
+
+button.danger{
+ background:#dc2626;
+}
+
+button.gray{
+ background:#475569;
+}
+
+.product{
+ border:1px solid #29364b;
+ border-radius:16px;
+ padding:15px;
+ margin:10px 0;
+ background:#0c1320;
+}
+
+.product-name{
+ font-size:19px;
+ font-weight:900;
+}
+
+.price{
+ color:#60a5fa;
+ font-size:21px;
+ font-weight:900;
+ margin:8px 0;
+}
+
+.small{
+ color:#94a3b8;
+ font-size:13px;
+ line-height:1.8;
+}
+
+.linkbox{
+ background:#020617;
+ padding:10px;
+ border-radius:10px;
+ word-break:break-all;
+ font-size:12px;
+ margin:8px 0;
+}
+
+.status{
+ color:#22c55e;
+ font-weight:900;
+}
+
+.status.off{
+ color:#ef4444;
+}
+
+@media(max-width:600px){
+ .container{width:94%;margin:15px auto}
+ .header{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+ <div class="logo">RZVPN ⚡</div>
+ <div class="muted">پنل مدیریت قیمت‌ها و لینک‌های اشتراک</div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>➕ افزودن پلن</h2>
+
+<input id="name" placeholder="نام پلن">
+<input id="price" placeholder="قیمت مثال: 150,000 تومان">
+<input id="volume" placeholder="حجم مثال: 100 گیگ">
+<input id="duration" placeholder="مدت مثال: 30 روز">
+<textarea id="description" placeholder="توضیحات پلن"></textarea>
+
+<button onclick="addProduct()">افزودن پلن</button>
+
+<div id="message"></div>
+
+</div>
+
+<div class="card">
+
+<h2>📊 آمار</h2>
+
+<div id="stats">در حال بارگذاری...</div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>📦 پلن‌های فروش</h2>
+
+<div id="products">در حال بارگذاری...</div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>🔗 لینک‌های ساخته‌شده</h2>
+
+<div id="subscriptions">در حال بارگذاری...</div>
+
+</div>
+
+</div>
+
+<script>
+
+let products = [];
+
+async function load(){
+
+ const p = await fetch("/api/products");
+ products = await p.json();
+
+ renderProducts();
+
+ const s = await fetch("/api/subscriptions");
+ const subs = await s.json();
+
+ renderSubscriptions(subs);
+
+ document.getElementById("stats").innerHTML =
+ `
+ <div>📦 تعداد پلن‌ها: <b>${products.length}</b></div>
+ <br>
+ <div>🔗 تعداد لینک‌ها: <b>${subs.length}</b></div>
+ `;
+}
+
+function esc(v){
+ return String(v ?? "")
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;");
+}
+
+function renderProducts(){
+
+ const box = document.getElementById("products");
+
+ if(!products.length){
+   box.innerHTML = "هنوز پلنی ساخته نشده است.";
+   return;
+ }
+
+ box.innerHTML = products.map(p => `
+
+ <div class="product">
+
+ <div class="product-name">${esc(p.name)}</div>
+
+ <div class="price">${esc(p.price)}</div>
+
+ <div class="small">
+ 📦 ${esc(p.volume)}
+ <br>
+ ⏱ ${esc(p.duration)}
+ <br>
+ ${esc(p.description)}
+ </div>
+
+ <div class="small">
+ وضعیت:
+ <span class="${p.active === false ? "status off":"status"}">
+ ${p.active === false ? "غیرفعال":"فعال"}
+ </span>
+ </div>
+
+ <br>
+
+ <button onclick="editProduct('${p.id}')">
+ ✏️ ویرایش
+ </button>
+
+ <button class="gray" onclick="createLink('${p.id}')">
+ 🔗 ساخت لینک
+ </button>
+
+ <button class="danger" onclick="deleteProduct('${p.id}')">
+ 🗑 حذف
+ </button>
+
+ </div>
+
+ `).join("");
+
+}
+
+function renderSubscriptions(subs){
+
+ const box = document.getElementById("subscriptions");
+
+ if(!subs.length){
+   box.innerHTML = "هنوز لینکی ساخته نشده است.";
+   return;
+ }
+
+ box.innerHTML = subs.map(s => {
+
+   const base = location.origin;
+
+   const link = `${base}/sub/${s.token}`;
+   const raw = `${base}/sub/${s.token}/raw`;
+
+   return `
+
+   <div class="product">
+
+   <b>${esc(s.productName)}</b>
+
+   <div class="small">
+   وضعیت:
+   <span class="${s.active ? "status":"status off"}">
+   ${s.active ? "فعال":"غیرفعال"}
+   </span>
+   </div>
+
+   <div class="linkbox">${esc(link)}</div>
+
+   <button onclick="copyText('${link}')">
+   📋 کپی لینک
+   </button>
+
+   <button class="gray" onclick="window.open('${link}','_blank')">
+   👁 مشاهده
+   </button>
+
+   <button class="gray" onclick="copyText('${raw}')">
+   📋 لینک Raw
+   </button>
+
+   <button onclick="toggleSub('${s.token}')">
+   ${s.active ? "⛔ غیرفعال کردن":"✅ فعال کردن"}
+   </button>
+
+   <button class="danger" onclick="deleteSub('${s.token}')">
+   🗑 حذف
+   </button>
+
+   </div>
+
+   `;
+
+ }).join("");
+
+}
+
+async function addProduct(){
+
+ const data = {
+   name: document.getElementById("name").value.trim(),
+   price: document.getElementById("price").value.trim(),
+   volume: document.getElementById("volume").value.trim(),
+   duration: document.getElementById("duration").value.trim(),
+   description: document.getElementById("description").value.trim()
+ };
+
+ if(!data.name || !data.price || !data.volume || !data.duration){
+   alert("نام، قیمت، حجم و مدت را وارد کنید.");
+   return;
+ }
+
+ const r = await fetch("/api/products",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(data)
+ });
+
+ const result = await r.json();
+
+ if(!r.ok){
+   alert(result.error || "خطا");
+   return;
+ }
+
+ document.getElementById("name").value="";
+ document.getElementById("price").value="";
+ document.getElementById("volume").value="";
+ document.getElementById("duration").value="";
+ document.getElementById("description").value="";
+
+ alert("پلن با موفقیت اضافه شد.");
+
+ load();
+}
+
+async function editProduct(id){
+
+ const p = products.find(x => x.id === id);
+
+ if(!p) return;
+
+ const name = prompt("نام پلن:",p.name);
+ if(name === null) return;
+
+ const price = prompt("قیمت:",p.price);
+ if(price === null) return;
+
+ const volume = prompt("حجم:",p.volume);
+ if(volume === null) return;
+
+ const duration = prompt("مدت:",p.duration);
+ if(duration === null) return;
+
+ const description = prompt("توضیحات:",p.description || "");
+ if(description === null) return;
+
+ const r = await fetch("/api/products/"+id,{
+   method:"PUT",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+     name,
+     price,
+     volume,
+     duration,
+     description
+   })
+ });
+
+ if(r.ok){
+   alert("پلن ویرایش شد.");
+   load();
+ }else{
+   alert("خطا در ویرایش.");
+ }
+
+}
+
+async function deleteProduct(id){
+
+ if(!confirm("این پلن حذف شود؟")) return;
+
+ const r = await fetch("/api/products/"+id,{
+   method:"DELETE"
+ });
+
+ if(r.ok){
+   load();
+ }else{
+   alert("خطا در حذف.");
+ }
+
+}
+
+async function createLink(id){
+
+ const r = await fetch("/api/subscription",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+     productId:id
+   })
+ });
+
+ const data = await r.json();
+
+ if(!r.ok){
+   alert(data.error || "خطا");
+   return;
+ }
+
+ prompt("لینک ساخته شد. کپی کنید:",data.link);
+
+ load();
+}
+
+async function toggleSub(token){
+
+ const r = await fetch(
+   "/api/subscription/"+token+"/toggle",
+   {method:"POST"}
+ );
+
+ if(r.ok){
+   load();
+ }
+
+}
+
+async function deleteSub(token){
+
+ if(!confirm("این لینک حذف شود؟")) return;
+
+ const r = await fetch(
+   "/api/subscription/"+token,
+   {method:"DELETE"}
+ );
+
+ if(r.ok){
+   load();
+ }
+
+}
+
+async function copyText(text){
+
+ try{
+
+   await navigator.clipboard.writeText(text);
+
+   alert("کپی شد ✅");
+
+ }catch(e){
+
+   prompt("کپی کنید:",text);
+
+ }
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
