@@ -761,7 +761,7 @@ app.get("*", (req, res) => {
   );
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log("");
   console.log("=================================");
   console.log(" RZVPN Subscription System v3");
