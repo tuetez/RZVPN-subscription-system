@@ -1,290 +1,247 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-
-<meta charset="utf-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-
-<title>مدیریت RZVPN</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RZVPN | مدیریت</title>
 
 <style>
-
-*{
- box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
- margin:0;
- background:#070b13;
- color:#fff;
- font-family:Tahoma,Arial,sans-serif;
+margin:0;
+font-family:Tahoma,Arial;
+background:#070812;
+color:#fff;
 }
 
-.container{
- width:min(1100px,94%);
- margin:20px auto 50px;
-}
-
-.header{
- background:#111827;
- border:1px solid #263449;
- border-radius:22px;
- padding:22px;
- margin-bottom:18px;
+header{
+padding:20px;
+background:#0e1121;
+border-bottom:1px solid #292f4c;
 }
 
 .logo{
- font-size:30px;
- font-weight:900;
+font-size:27px;
+font-weight:bold;
+color:#55b7ff;
 }
 
-.muted{
- color:#94a3b8;
- margin-top:7px;
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px 15px 50px;
 }
 
-.grid{
- display:grid;
- grid-template-columns:
- repeat(auto-fit,minmax(280px,1fr));
- gap:18px;
+.login{
+max-width:420px;
+margin:80px auto;
+background:#111526;
+border:1px solid #2c3353;
+border-radius:22px;
+padding:25px;
 }
 
-.card{
- background:#111827;
- border:1px solid #263449;
- border-radius:20px;
- padding:20px;
+.panel{
+background:#101423;
+border:1px solid #282f4e;
+border-radius:20px;
+padding:20px;
+margin-bottom:20px;
 }
 
-h2{
- margin-top:0;
+input,textarea,select{
+width:100%;
+background:#080a14;
+border:1px solid #303752;
+color:white;
+border-radius:11px;
+padding:12px;
+margin:6px 0 12px;
+font-family:inherit;
 }
 
-input,
 textarea{
- width:100%;
- background:#0b1220;
- color:#fff;
- border:1px solid #334155;
- border-radius:12px;
- padding:13px;
- margin:7px 0;
- font-family:inherit;
-}
-
-textarea{
- min-height:85px;
+min-height:90px;
+resize:vertical;
 }
 
 button{
- border:0;
- border-radius:12px;
- padding:12px 15px;
- cursor:pointer;
- font-family:inherit;
- font-weight:900;
- margin:4px;
- background:#2563eb;
- color:#fff;
+border:0;
+border-radius:11px;
+padding:11px 15px;
+background:#168cff;
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin:4px;
 }
 
-button.gray{
- background:#475569;
+button.red{background:#c93345}
+button.gray{background:#30364d}
+button.green{background:#168b50}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:15px;
 }
 
-button.danger{
- background:#dc2626;
+.card{
+background:#15192a;
+border:1px solid #2b3150;
+border-radius:18px;
+padding:16px;
 }
 
-.product{
- border:1px solid #29364b;
- border-radius:16px;
- padding:15px;
- margin:10px 0;
- background:#0c1320;
+.card h3{
+margin-top:0;
+color:#65bdff;
 }
 
-.select-product{
- display:flex;
- align-items:flex-start;
- gap:12px;
- cursor:pointer;
+.muted{
+color:#9298af;
+font-size:13px;
+line-height:1.9;
 }
 
-.select-product input{
- width:22px;
- height:22px;
- margin:2px 0 0;
- accent-color:#2563eb;
+.badge{
+display:inline-block;
+padding:5px 9px;
+border-radius:20px;
+background:#174a31;
+color:#8dffb4;
+font-size:12px;
 }
 
-.product-name{
- font-size:18px;
- font-weight:900;
+.badge.off{
+background:#49202a;
+color:#ff9aaa;
 }
 
-.price{
- color:#60a5fa;
- font-size:20px;
- font-weight:900;
- margin:7px 0;
+.hidden{
+display:none;
 }
 
-.small{
- color:#94a3b8;
- font-size:13px;
- line-height:1.8;
+table{
+width:100%;
+border-collapse:collapse;
+overflow:hidden;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #292f49;
+text-align:right;
+vertical-align:top;
+}
+
+.order{
+margin-bottom:12px;
+padding:15px;
+border:1px solid #2b3150;
+border-radius:15px;
+background:#14182a;
 }
 
 .linkbox{
- background:#020617;
- padding:11px;
- border-radius:10px;
- word-break:break-all;
- font-size:12px;
- margin:8px 0;
+padding:14px;
+background:#080b15;
+border-radius:13px;
+margin:10px 0;
+word-break:break-all;
 }
-
-.status{
- color:#22c55e;
- font-weight:900;
-}
-
-.status.off{
- color:#ef4444;
-}
-
-.selected-count{
- display:inline-block;
- background:#172554;
- color:#93c5fd;
- padding:7px 12px;
- border-radius:999px;
- font-size:13px;
- font-weight:900;
- margin-bottom:10px;
-}
-
-@media(max-width:600px){
- .container{
-   width:94%;
-   margin-top:12px;
- }
-}
-
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<header>
+<div class="logo">RZVPN — مدیریت</div>
+</header>
 
-<div class="header">
+<div id="loginBox" class="login">
 
-<div class="logo">
-RZVPN ⚡
+<h2>ورود مدیر</h2>
+
+<p class="muted">
+برای ورود به پنل مدیریت رمز مدیر را وارد کنید.
+</p>
+
+<input id="password" type="password" placeholder="رمز مدیریت">
+
+<button onclick="login()">ورود به پنل</button>
+
+<p id="loginError"></p>
+
 </div>
 
-<div class="muted">
-پنل مدیریت قیمت‌ها و لینک‌های گروهی
-</div>
+<div id="app" class="container hidden">
+
+<div class="panel">
+
+<h2>➕ افزودن / ویرایش محصول</h2>
+
+<input type="hidden" id="editId">
+
+<label>نام محصول</label>
+<input id="name" placeholder="مثلاً تک لوکیشن">
+
+<label>قیمت</label>
+<input id="price" placeholder="مثلاً 150,000 تومان">
+
+<label>حجم</label>
+<input id="volume" placeholder="مثلاً 100 گیگ">
+
+<label>مدت</label>
+<input id="duration" placeholder="مثلاً 30 روز">
+
+<label>لوکیشن</label>
+<input id="location" placeholder="مثلاً ترکیه 🇹🇷">
+
+<label>پروتکل</label>
+<input id="protocol" placeholder="مثلاً WireGuard + Amnezia">
+
+<label>توضیحات</label>
+<textarea id="description"></textarea>
+
+<button onclick="saveProduct()">💾 ذخیره محصول</button>
+<button class="gray" onclick="clearForm()">پاک کردن فرم</button>
 
 </div>
 
-<div class="grid">
+<div class="panel">
 
-<div class="card">
+<h2>📦 محصولات</h2>
 
-<h2>➕ افزودن پلن</h2>
+<div id="products" class="grid"></div>
 
-<input id="name" placeholder="نام پلن">
+</div>
 
-<input id="price"
-placeholder="قیمت مثال: 150,000 تومان">
+<div class="panel">
 
-<input id="volume"
-placeholder="حجم مثال: 100 گیگ">
+<h2>🔗 ساخت لینک عمومی قیمت</h2>
 
-<input id="duration"
-placeholder="مدت مثال: 30 روز">
+<p class="muted">
+محصولات موردنظر را انتخاب کنید و یک لینک عمومی برای مشتری بسازید.
+</p>
 
-<textarea
-id="description"
-placeholder="توضیحات پلن"></textarea>
+<div id="selectProducts"></div>
 
-<button onclick="addProduct()">
-افزودن پلن
+<button onclick="createLink()">
+🔗 ساخت لینک
 </button>
 
-</div>
-
-<div class="card">
-
-<h2>📊 آمار</h2>
-
-<div id="stats">
-در حال بارگذاری...
-</div>
+<div id="links"></div>
 
 </div>
 
-</div>
+<div class="panel">
 
-<br>
+<h2>🛒 سفارش‌های مشتریان</h2>
 
-<div class="card">
-
-<h2>📦 انتخاب پلن‌ها برای یک لینک</h2>
-
-<div class="selected-count">
-انتخاب شده: <span id="selectedCount">0</span>
-</div>
-
-<br>
-
-<button onclick="selectAll()">
-☑️ انتخاب همه
-</button>
-
-<button class="gray" onclick="clearAll()">
-❌ لغو انتخاب
-</button>
-
-<button onclick="createGroupLink()">
-🔗 ساخت یک لینک برای پلن‌های انتخاب‌شده
-</button>
-
-<div id="products">
-در حال بارگذاری...
-</div>
-
-</div>
-
-<br>
-
-<div class="card">
-
-<h2>🔗 لینک‌های گروهی</h2>
-
-<div id="pricingLinks">
-در حال بارگذاری...
-</div>
-
-</div>
-
-<br>
-
-<div class="card">
-
-<h2>📋 لینک‌های اشتراک تکی</h2>
-
-<div id="subscriptions">
-در حال بارگذاری...
+<div id="orders">
+در حال دریافت سفارش‌ها...
 </div>
 
 </div>
@@ -293,693 +250,532 @@ placeholder="توضیحات پلن"></textarea>
 
 <script>
 
-let products = [];
+let TOKEN="";
+let products=[];
 
-async function load(){
+function authHeaders(){
 
- const p =
-   await fetch("/api/products");
-
- products = await p.json();
-
- renderProducts();
-
- const s =
-   await fetch("/api/subscriptions");
-
- const subs =
-   await s.json();
-
- renderSubscriptions(subs);
-
- const l =
-   await fetch("/api/pricing-links");
-
- const links =
-   await l.json();
-
- renderPricingLinks(links);
-
- updateStats(links,subs);
-}
-
-function esc(v){
-
- return String(v ?? "")
- .replace(/&/g,"&amp;")
- .replace(/</g,"&lt;")
- .replace(/>/g,"&gt;")
- .replace(/"/g,"&quot;");
+return {
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+};
 
 }
 
-function updateStats(links,subs){
+async function login(){
 
- document.getElementById("stats").innerHTML = `
- <div>📦 تعداد پلن‌ها:
- <b>${products.length}</b>
- </div>
- <br>
- <div>🔗 لینک‌های گروهی:
- <b>${links.length}</b>
- </div>
- <br>
- <div>👤 اشتراک‌های تکی:
- <b>${subs.length}</b>
- </div>
- `;
+const password=document.getElementById("password").value;
+
+const res=await fetch("/api/admin/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({password})
+});
+
+const data=await res.json();
+
+if(!data.success){
+
+document.getElementById("loginError").textContent=
+"❌ "+data.error;
+
+return;
+
+}
+
+TOKEN=data.token;
+
+sessionStorage.setItem("rzvpn_admin_token",TOKEN);
+
+showApp();
+
+loadAll();
+
+}
+
+function showApp(){
+
+document.getElementById("loginBox").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+
+}
+
+async function loadAll(){
+
+await loadProducts();
+await loadLinks();
+await loadOrders();
+
+}
+
+async function loadProducts(){
+
+const res=await fetch("/api/admin/products",{
+headers:authHeaders()
+});
+
+if(res.status===401){
+logout();
+return;
+}
+
+products=await res.json();
+
+renderProducts();
+renderSelectProducts();
 
 }
 
 function renderProducts(){
 
- const box =
-   document.getElementById("products");
+const box=document.getElementById("products");
 
- if(!products.length){
+if(!products.length){
 
-   box.innerHTML =
-     "هنوز پلنی ساخته نشده است.";
+box.innerHTML="<p>هنوز محصولی ساخته نشده است.</p>";
 
-   return;
- }
-
- box.innerHTML =
- products.map(p => `
-
- <div class="product">
-
- <label class="select-product">
-
- <input
- type="checkbox"
- class="product-check"
- value="${esc(p.id)}"
- onchange="updateSelectedCount()"
- ${p.active === false ? "disabled":""}
- >
-
- <div>
-
- <div class="product-name">
- ${esc(p.name)}
- </div>
-
- <div class="price">
- ${esc(p.price)}
- </div>
-
- <div class="small">
- 📦 ${esc(p.volume)}
- <br>
- ⏱ ${esc(p.duration)}
- <br>
- ${esc(p.description)}
- </div>
-
- <div class="small">
-
- وضعیت:
-
- <span class="${p.active === false
- ? "status off"
- : "status"}">
-
- ${p.active === false
- ? "غیرفعال"
- : "فعال"}
-
- </span>
-
- </div>
-
- </div>
-
- </label>
-
- <br>
-
- <button onclick="editProduct('${p.id}')">
- ✏️ ویرایش
- </button>
-
- <button
- class="gray"
- onclick="createSingleLink('${p.id}')">
-
- 🔗 لینک تکی
-
- </button>
-
- <button
- class="danger"
- onclick="deleteProduct('${p.id}')">
-
- 🗑 حذف
- </button>
-
- </div>
-
- `).join("");
-
- updateSelectedCount();
+return;
 
 }
 
-function getSelected(){
+box.innerHTML=products.map(p=>`
 
- return [...document.querySelectorAll(
-   ".product-check:checked"
- )].map(x => x.value);
+<div class="card">
 
-}
+<h3>${esc(p.name)}</h3>
 
-function updateSelectedCount(){
+<div class="muted">
+💰 ${esc(p.price || "-")}<br>
+📦 ${esc(p.volume || "-")}<br>
+⏱ ${esc(p.duration || "-")}<br>
+📍 ${esc(p.location || "-")}<br>
+🔐 ${esc(p.protocol || "-")}<br>
+${esc(p.description || "")}
+</div>
 
- document.getElementById(
-   "selectedCount"
- ).textContent = getSelected().length;
+<p>
+<span class="badge ${p.active===false?"off":""}">
+${p.active===false?"غیرفعال":"فعال"}
+</span>
+</p>
 
-}
+<button onclick="editProduct('${p.id}')">✏️ ویرایش</button>
 
-function selectAll(){
+<button class="gray"
+onclick="toggleProduct('${p.id}')">
+${p.active===false?"فعال کردن":"غیرفعال کردن"}
+</button>
 
- document.querySelectorAll(
-   ".product-check:not(:disabled)"
- ).forEach(x => x.checked = true);
+<button class="red"
+onclick="deleteProduct('${p.id}')">
+حذف
+</button>
 
- updateSelectedCount();
+</div>
 
-}
-
-function clearAll(){
-
- document.querySelectorAll(
-   ".product-check"
- ).forEach(x => x.checked = false);
-
- updateSelectedCount();
-
-}
-
-async function createGroupLink(){
-
- const ids = getSelected();
-
- if(ids.length < 2){
-
-   alert(
-     "حداقل ۲ پلن را انتخاب کنید."
-   );
-
-   return;
- }
-
- const r =
-   await fetch("/api/pricing-links",{
-     method:"POST",
-     headers:{
-       "Content-Type":"application/json"
-     },
-     body:JSON.stringify({
-       productIds:ids
-     })
-   });
-
- const data =
-   await r.json();
-
- if(!r.ok){
-
-   alert(
-     data.error || "خطا"
-   );
-
-   return;
- }
-
- prompt(
-   "✅ لینک گروهی ساخته شد.\\n\\nاین یک لینک شامل تمام پلن‌های انتخاب‌شده است:",
-   data.link
- );
-
- clearAll();
-
- load();
+`).join("");
 
 }
 
-function renderPricingLinks(links){
+function renderSelectProducts(){
 
- const box =
-   document.getElementById(
-     "pricingLinks"
-   );
+const box=document.getElementById("selectProducts");
 
- if(!links.length){
+box.innerHTML=products
+.filter(p=>p.active!==false)
+.map(p=>`
 
-   box.innerHTML =
-     "هنوز لینک گروهی ساخته نشده است.";
+<label style="display:block;margin:10px 0">
+<input type="checkbox"
+class="productCheck"
+value="${p.id}"
+style="width:auto">
+${esc(p.name)} — ${esc(p.price || "")}
+</label>
 
-   return;
- }
-
- box.innerHTML =
- links.map(l => {
-
- const base =
-   location.origin;
-
- const url =
-   `${base}/pricing/${l.token}`;
-
- const names =
-   l.products
-    .map(p => p.name)
-    .join(" • ");
-
- return `
-
- <div class="product">
-
- <b>🔗 لینک گروهی</b>
-
- <div class="small">
- ${esc(names)}
- </div>
-
- <div class="linkbox">
- ${esc(url)}
- </div>
-
- <button onclick="copyText('${url}')">
- 📋 کپی لینک
- </button>
-
- <button
- class="gray"
- onclick="window.open('${url}','_blank')">
-
- 👁 مشاهده
- </button>
-
- <button
- onclick="toggleGroup('${l.token}')">
-
- ${l.active
-   ? "⛔ غیرفعال"
-   : "✅ فعال"}
-
- </button>
-
- <button
- class="danger"
- onclick="deleteGroup('${l.token}')">
-
- 🗑 حذف
-
- </button>
-
- </div>
-
- `;
-
- }).join("");
+`).join("");
 
 }
 
-async function addProduct(){
+async function saveProduct(){
 
- const data = {
+const body={
+name:document.getElementById("name").value,
+price:document.getElementById("price").value,
+volume:document.getElementById("volume").value,
+duration:document.getElementById("duration").value,
+location:document.getElementById("location").value,
+protocol:document.getElementById("protocol").value,
+description:document.getElementById("description").value,
+active:true
+};
 
- name:
- document.getElementById("name")
- .value.trim(),
+const editId=document.getElementById("editId").value;
 
- price:
- document.getElementById("price")
- .value.trim(),
+let url="/api/admin/products";
+let method="POST";
 
- volume:
- document.getElementById("volume")
- .value.trim(),
+if(editId){
 
- duration:
- document.getElementById("duration")
- .value.trim(),
-
- description:
- document.getElementById("description")
- .value.trim()
-
- };
-
- if(
-   !data.name ||
-   !data.price ||
-   !data.volume ||
-   !data.duration
- ){
-
-   alert(
-     "نام، قیمت، حجم و مدت را وارد کنید."
-   );
-
-   return;
- }
-
- const r =
-   await fetch("/api/products",{
-
-     method:"POST",
-
-     headers:{
-       "Content-Type":
-       "application/json"
-     },
-
-     body:JSON.stringify(data)
-
-   });
-
- const result =
-   await r.json();
-
- if(!r.ok){
-
-   alert(
-     result.error || "خطا"
-   );
-
-   return;
- }
-
- document.getElementById("name").value="";
- document.getElementById("price").value="";
- document.getElementById("volume").value="";
- document.getElementById("duration").value="";
- document.getElementById("description").value="";
-
- alert("پلن اضافه شد ✅");
-
- load();
+url+="/"+editId;
+method="PUT";
 
 }
 
-async function editProduct(id){
+const res=await fetch(url,{
+method,
+headers:authHeaders(),
+body:JSON.stringify(body)
+});
 
- const p =
-   products.find(x => x.id === id);
+const data=await res.json();
 
- if(!p) return;
+if(!res.ok){
 
- const name =
-   prompt("نام پلن:",p.name);
+alert(data.error || "خطا");
 
- if(name === null) return;
+return;
 
- const price =
-   prompt("قیمت:",p.price);
+}
 
- if(price === null) return;
+clearForm();
+await loadProducts();
 
- const volume =
-   prompt("حجم:",p.volume);
+alert("محصول ذخیره شد.");
 
- if(volume === null) return;
+}
 
- const duration =
-   prompt("مدت:",p.duration);
+function editProduct(id){
 
- if(duration === null) return;
+const p=products.find(x=>String(x.id)===String(id));
 
- const description =
-   prompt(
-     "توضیحات:",
-     p.description || ""
-   );
+if(!p)return;
 
- if(description === null) return;
+document.getElementById("editId").value=p.id;
+document.getElementById("name").value=p.name||"";
+document.getElementById("price").value=p.price||"";
+document.getElementById("volume").value=p.volume||"";
+document.getElementById("duration").value=p.duration||"";
+document.getElementById("location").value=p.location||"";
+document.getElementById("protocol").value=p.protocol||"";
+document.getElementById("description").value=p.description||"";
 
- const r =
-   await fetch(
-     "/api/products/"+id,
-     {
-       method:"PUT",
-       headers:{
-         "Content-Type":
-         "application/json"
-       },
-       body:JSON.stringify({
-         name,
-         price,
-         volume,
-         duration,
-         description
-       })
-     }
-   );
+window.scrollTo({top:0,behavior:"smooth"});
 
- if(r.ok){
+}
 
-   alert("ویرایش شد ✅");
+function clearForm(){
 
-   load();
+[
+"editId",
+"name",
+"price",
+"volume",
+"duration",
+"location",
+"protocol",
+"description"
+].forEach(id=>{
+document.getElementById(id).value="";
+});
 
- }else{
+}
 
-   alert("خطا در ویرایش");
+async function toggleProduct(id){
 
- }
+await fetch("/api/admin/products/"+id+"/toggle",{
+method:"POST",
+headers:authHeaders()
+});
+
+loadProducts();
 
 }
 
 async function deleteProduct(id){
 
- if(!confirm(
-   "این پلن حذف شود؟"
- )) return;
+if(!confirm("این محصول حذف شود؟"))return;
 
- const r =
-   await fetch(
-     "/api/products/"+id,
-     {method:"DELETE"}
-   );
+await fetch("/api/admin/products/"+id,{
+method:"DELETE",
+headers:authHeaders()
+});
 
- if(r.ok){
-
-   load();
-
- }else{
-
-   alert("خطا در حذف");
-
- }
+loadProducts();
 
 }
 
-async function createSingleLink(id){
+async function createLink(){
 
- const r =
-   await fetch(
-     "/api/subscription",
-     {
-       method:"POST",
-       headers:{
-         "Content-Type":
-         "application/json"
-       },
-       body:JSON.stringify({
-         productId:id
-       })
-     }
-   );
+const ids=[...document.querySelectorAll(".productCheck:checked")]
+.map(x=>x.value);
 
- const data =
-   await r.json();
+if(!ids.length){
 
- if(!r.ok){
+alert("حداقل یک محصول انتخاب کنید.");
 
-   alert(
-     data.error || "خطا"
-   );
-
-   return;
- }
-
- prompt(
-   "لینک اشتراک ساخته شد:",
-   data.link
- );
-
- load();
+return;
 
 }
 
-function renderSubscriptions(subs){
+const res=await fetch("/api/pricing-links",{
+method:"POST",
+headers:authHeaders(),
+body:JSON.stringify({productIds:ids})
+});
 
- const box =
-   document.getElementById(
-     "subscriptions"
-   );
+const data=await res.json();
 
- if(!subs.length){
+if(!res.ok){
 
-   box.innerHTML =
-     "هنوز اشتراک تکی وجود ندارد.";
+alert(data.error);
 
-   return;
- }
-
- box.innerHTML =
- subs.map(s => {
-
- const url =
-   `${location.origin}/sub/${s.token}`;
-
- return `
-
- <div class="product">
-
- <b>${esc(s.productName)}</b>
-
- <div class="small">
- وضعیت:
- <span class="${
-   s.active
-   ? "status"
-   : "status off"
- }">
-
- ${
-   s.active
-   ? "فعال"
-   : "غیرفعال"
- }
-
- </span>
- </div>
-
- <div class="linkbox">
- ${esc(url)}
- </div>
-
- <button
- onclick="copyText('${url}')">
-
- 📋 کپی
-
- </button>
-
- <button
- class="gray"
- onclick="window.open('${url}','_blank')">
-
- 👁 مشاهده
-
- </button>
-
- <button
- onclick="toggleSingle('${s.token}')">
-
- ${s.active
-   ? "⛔ غیرفعال"
-   : "✅ فعال"}
-
- </button>
-
- <button
- class="danger"
- onclick="deleteSingle('${s.token}')">
-
- 🗑 حذف
-
- </button>
-
- </div>
-
- `;
-
- }).join("");
+return;
 
 }
 
-async function toggleGroup(token){
+const full=location.origin+data.url;
 
- await fetch(
-   "/api/pricing-links/"+token+"/toggle",
-   {method:"POST"}
- );
+alert("لینک ساخته شد:\n\n"+full);
 
- load();
+await loadLinks();
 
 }
 
-async function deleteGroup(token){
+async function loadLinks(){
 
- if(!confirm(
-   "این لینک گروهی حذف شود؟"
- )) return;
+const res=await fetch("/api/pricing-links",{
+headers:authHeaders()
+});
 
- await fetch(
-   "/api/pricing-links/"+token,
-   {method:"DELETE"}
- );
+if(!res.ok)return;
 
- load();
+const links=await res.json();
 
-}
+const box=document.getElementById("links");
 
-async function toggleSingle(token){
+if(!links.length){
 
- await fetch(
-   "/api/subscription/"+token+"/toggle",
-   {method:"POST"}
- );
+box.innerHTML="<p>هنوز لینکی ساخته نشده است.</p>";
 
- load();
+return;
 
 }
 
-async function deleteSingle(token){
+box.innerHTML=links.map(l=>{
 
- if(!confirm(
-   "این لینک حذف شود؟"
- )) return;
+const url=location.origin+"/pricing/"+l.token;
 
- await fetch(
-   "/api/subscription/"+token,
-   {method:"DELETE"}
- );
+const names=l.productIds.map(id=>{
+const p=products.find(x=>String(x.id)===String(id));
+return p?p.name:"محصول حذف‌شده";
+});
 
- load();
+return `
+
+<div class="linkbox">
+
+<b>${names.map(esc).join("، ")}</b>
+
+<br><br>
+
+<a href="${url}" target="_blank" style="color:#55b7ff">
+${url}
+</a>
+
+<br><br>
+
+<span class="badge ${l.active===false?"off":""}">
+${l.active===false?"غیرفعال":"فعال"}
+</span>
+
+<br>
+
+<button onclick="copyText('${url}')">
+📋 کپی لینک
+</button>
+
+<button class="gray"
+onclick="toggleLink('${l.token}')">
+${l.active===false?"فعال کردن":"غیرفعال کردن"}
+</button>
+
+<button class="red"
+onclick="deleteLink('${l.token}')">
+حذف
+</button>
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+async function toggleLink(token){
+
+await fetch("/api/pricing-links/"+token+"/toggle",{
+method:"POST",
+headers:authHeaders()
+});
+
+loadLinks();
+
+}
+
+async function deleteLink(token){
+
+if(!confirm("این لینک حذف شود؟"))return;
+
+await fetch("/api/pricing-links/"+token,{
+method:"DELETE",
+headers:authHeaders()
+});
+
+loadLinks();
 
 }
 
 async function copyText(text){
 
- try{
+await navigator.clipboard.writeText(text);
 
-   await navigator.clipboard
-     .writeText(text);
-
-   alert("کپی شد ✅");
-
- }catch(e){
-
-   prompt(
-     "لینک را کپی کنید:",
-     text
-   );
-
- }
+alert("لینک کپی شد.");
 
 }
 
-load();
+async function loadOrders(){
+
+const res=await fetch("/api/admin/orders",{
+headers:authHeaders()
+});
+
+if(!res.ok)return;
+
+const orders=await res.json();
+
+const box=document.getElementById("orders");
+
+if(!orders.length){
+
+box.innerHTML="<p>هنوز سفارشی ثبت نشده است.</p>";
+
+return;
+
+}
+
+box.innerHTML=orders.map(o=>`
+
+<div class="order">
+
+<b>👤 ${esc(o.customerName)}</b>
+
+<div class="muted">
+
+📦 محصول: ${esc(o.productName)}<br>
+💰 قیمت: ${esc(o.productPrice || "-")}<br>
+📞 تماس: ${esc(o.contact)}<br>
+📝 توضیح: ${esc(o.note || "-")}<br>
+🕐 ${new Date(o.createdAt).toLocaleString("fa-IR")}
+
+</div>
+
+<select onchange="changeOrderStatus('${o.id}',this.value)">
+
+${[
+"جدید",
+"در حال بررسی",
+"تکمیل شده",
+"لغو شده"
+].map(s=>`
+
+<option ${o.status===s?"selected":""}>
+${s}
+</option>
+
+`).join("")}
+
+</select>
+
+<button class="red"
+onclick="deleteOrder('${o.id}')">
+حذف سفارش
+</button>
+
+</div>
+
+`).join("");
+
+}
+
+async function changeOrderStatus(id,status){
+
+await fetch("/api/admin/orders/"+id+"/status",{
+method:"POST",
+headers:authHeaders(),
+body:JSON.stringify({status})
+});
+
+loadOrders();
+
+}
+
+async function deleteOrder(id){
+
+if(!confirm("سفارش حذف شود؟"))return;
+
+await fetch("/api/admin/orders/"+id,{
+method:"DELETE",
+headers:authHeaders()
+});
+
+loadOrders();
+
+}
+
+function logout(){
+
+sessionStorage.removeItem("rzvpn_admin_token");
+location.reload();
+
+}
+
+function esc(v){
+
+return String(v ?? "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+TOKEN=sessionStorage.getItem("rzvpn_admin_token")||"";
+
+if(TOKEN){
+
+fetch("/api/admin/check",{
+headers:authHeaders()
+}).then(res=>{
+
+if(res.ok){
+
+showApp();
+loadAll();
+
+}else{
+
+logout();
+
+}
+
+});
+
+}
 
 </script>
 
 </body>
-
 </html>

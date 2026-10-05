@@ -1,55 +1,334 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RZVPN | ارائه دهنده خدمات RZVPN</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RZVPN | سرویس‌های VPN</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#070a10;color:#f8fafc;font-family:Tahoma,Arial,sans-serif}
-header{padding:28px 18px;text-align:center;background:linear-gradient(135deg,#0b1220,#15102a);border-bottom:1px solid #263244}
-h1{margin:0;font-size:30px}.provider{margin-top:9px;color:#a5b4fc;font-weight:800}
-.wrap{max-width:1100px;margin:auto;padding:22px 16px}.search{width:100%;padding:14px;border-radius:14px;border:1px solid #334155;background:#0f172a;color:white;font-size:16px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}.filters button{border:1px solid #334155;background:#111827;color:#fff;padding:9px 13px;border-radius:10px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:#0f172a;border:1px solid #263244;border-radius:18px;padding:18px;box-shadow:0 10px 30px #0004}
-.tag{display:inline-block;padding:6px 9px;border-radius:9px;background:#172554;color:#bfdbfe;font-size:12px;font-weight:800}
-h2{font-size:20px;margin:13px 0 8px}.price{font-size:22px;font-weight:900;margin:12px 0;color:#67e8f9}.specs{color:#cbd5e1;line-height:1.9}.desc{color:#94a3b8;line-height:1.8;margin-top:8px}
-.actions{display:grid;gap:9px;margin-top:15px}button.action{padding:12px;border:0;border-radius:11px;color:white;font-weight:800;cursor:pointer;background:#2563eb}button.copy{background:#7c3aed}
-.related{margin-top:16px;padding-top:14px;border-top:1px solid #263244}.related-title{font-weight:800;margin-bottom:9px;color:#cbd5e1}.related-list{display:flex;gap:7px;flex-wrap:wrap}.rel{background:#172033;color:#fff;border:1px solid #334155;border-radius:9px;padding:7px 9px;cursor:pointer}
-#msg{position:fixed;bottom:18px;right:18px;background:#111827;border:1px solid #334155;padding:12px 14px;border-radius:12px;display:none}
-</style></head>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:#070812;
+color:#fff;
+min-height:100vh;
+}
+header{
+padding:20px;
+background:linear-gradient(135deg,#11152d,#080914);
+border-bottom:1px solid #242844;
+text-align:center;
+}
+.logo{
+font-size:34px;
+font-weight:900;
+letter-spacing:2px;
+color:#55b7ff;
+text-shadow:0 0 25px #168cff;
+}
+.subtitle{
+margin-top:8px;
+color:#aaaec5;
+}
+.container{
+max-width:1100px;
+margin:auto;
+padding:25px 15px 60px;
+}
+.hero{
+padding:30px 20px;
+border:1px solid #252b49;
+border-radius:25px;
+background:linear-gradient(145deg,#11162d,#0b0d19);
+box-shadow:0 20px 60px #0008;
+margin-bottom:25px;
+text-align:center;
+}
+.hero h1{
+font-size:30px;
+margin:5px 0 12px;
+}
+.hero p{
+color:#aeb5cf;
+line-height:2;
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+}
+.card{
+background:#101322;
+border:1px solid #252b48;
+border-radius:22px;
+padding:20px;
+transition:.2s;
+}
+.card:hover{
+transform:translateY(-4px);
+border-color:#428cff;
+box-shadow:0 15px 40px #0008;
+}
+.card h2{
+margin-top:0;
+font-size:21px;
+}
+.price{
+font-size:27px;
+font-weight:bold;
+color:#55b7ff;
+margin:15px 0;
+}
+.info{
+line-height:2;
+color:#c7cbe0;
+font-size:14px;
+}
+button{
+border:0;
+border-radius:13px;
+padding:13px 18px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+background:#168cff;
+color:#fff;
+width:100%;
+margin-top:12px;
+}
+button:hover{background:#006fd5}
+.empty{
+text-align:center;
+padding:50px;
+color:#aaa;
+}
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:20;
+padding:15px;
+}
+.modal-box{
+max-width:500px;
+margin:7vh auto;
+background:#101322;
+border:1px solid #2b3355;
+border-radius:22px;
+padding:25px;
+}
+input,textarea{
+width:100%;
+background:#080a14;
+border:1px solid #303752;
+color:white;
+border-radius:12px;
+padding:13px;
+margin:7px 0 12px;
+font-family:inherit;
+}
+textarea{min-height:100px;resize:vertical}
+.close{
+background:#292e42;
+}
+.success{
+padding:15px;
+border-radius:14px;
+background:#10351f;
+color:#8ff0ad;
+margin-top:12px;
+}
+footer{
+text-align:center;
+padding:30px;
+color:#777c95;
+}
+</style>
+</head>
+
 <body>
-<header><h1>RZVPN</h1><div class="provider">ارائه دهنده خدمات RZVPN</div></header>
-<div class="wrap">
-<input id="search" class="search" placeholder="جستجوی محصول، حجم یا نام...">
-<div class="filters"><button onclick="setFilter('')">همه محصولات</button><button onclick="setFilter('پاسارگاد')">پاسارگاد #40</button><button onclick="setFilter('ربکا')">ربکا #14</button></div>
-<div id="grid" class="grid"></div></div><div id="msg"></div>
+
+<header>
+<div class="logo">RZVPN</div>
+<div class="subtitle">FAST • SECURE • NO LIMITS</div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+<h1>سرویس‌های RZVPN</h1>
+<p>
+اتصال پایدار، سرویس‌های متنوع و پلن‌های مختلف را بررسی کنید.
+پلن موردنظر خود را انتخاب و سفارش خود را ثبت کنید.
+</p>
+</section>
+
+<div id="products" class="grid">
+<div class="empty">در حال دریافت محصولات...</div>
+</div>
+
+</div>
+
+<div id="modal" class="modal">
+<div class="modal-box">
+
+<h2 id="modalTitle">ثبت سفارش</h2>
+
+<form id="orderForm">
+
+<input type="hidden" id="productId">
+
+<label>نام و نام خانوادگی</label>
+<input id="customerName" required placeholder="مثلاً رضا احمدی">
+
+<label>شماره تماس / آیدی</label>
+<input id="contact" required placeholder="شماره تماس یا آیدی">
+
+<label>توضیحات</label>
+<textarea id="note" placeholder="اگر توضیحی دارید بنویسید"></textarea>
+
+<button type="submit">ثبت سفارش</button>
+<button type="button" class="close" onclick="closeModal()">بستن</button>
+
+</form>
+
+<div id="result"></div>
+
+</div>
+</div>
+
+<footer>
+RZVPN — سرویس VPN
+</footer>
+
 <script>
-const products=[{"id": "pasargad-150", "name": "#40 پاسارگاد", "volume": "150GB", "price": "337,500 تومان", "duration": "30 روزه", "description": "هشت لوکیشن فعال و پرسرعت در اختلال 🔥🚀", "tunnel": "TUNEL IRAN 🇸🇪🇩🇪", "locations": "🇸🇪 🇩🇪 🇨🇵 🇹🇷 🇨🇦 🇵🇱 🇳🇱 🇪🇸"}, {"id": "rebecca-150", "name": "#14 ربکا", "volume": "150GB", "price": "348,750 تومان", "duration": "30 روزه", "description": "پنل مولتی لوکیشن 🇩🇪🇫🇷🇹🇷🇵🇱🇫🇮🇺🇸🇳🇱🇬🇧 با سرعتی بالا و پشتیبانی سریع.", "locations": "🇩🇪 🇫🇷 🇹🇷 🇵🇱 🇫🇮 🇺🇸 🇳🇱 🇬🇧"}, {"id": "rebecca-200", "name": "#14 ربکا", "volume": "200GB", "price": "455,000 تومان", "duration": "30 روزه", "description": "پنل مولتی لوکیشن 🇩🇪🇫🇷🇹🇷🇵🇱🇫🇮🇺🇸🇳🇱🇬🇧 با سرعتی بالا و پشتیبانی سریع.", "locations": "🇩🇪 🇫🇷 🇹🇷 🇵🇱 🇫🇮 🇺🇸 🇳🇱 🇬🇧"}, {"id": "rebecca-300", "name": "#14 ربکا", "volume": "300GB", "price": "630,000 تومان", "duration": "30 روزه", "description": "پنل مولتی لوکیشن 🇩🇪🇫🇷🇹🇷🇵🇱🇫🇮🇺🇸🇳🇱🇬🇧 با سرعتی بالا و پشتیبانی سریع.", "locations": "🇩🇪 🇫🇷 🇹🇷 🇵🇱 🇫🇮 🇺🇸 🇳🇱 🇬🇧"}, {"id": "rebecca-400", "name": "#14 ربکا", "volume": "400GB", "price": "950,000 تومان", "duration": "30 روزه", "description": "پنل مولتی لوکیشن 🇩🇪🇫🇷🇹🇷🇵🇱🇫🇮🇺🇸🇳🇱🇬🇧 با سرعتی بالا و پشتیبانی سریع.", "locations": "🇩🇪 🇫🇷 🇹🇷 🇵🇱 🇫🇮 🇺🇸 🇳🇱 🇬🇧"}, {"id": "pasargad-200", "name": "#40 پاسارگاد", "volume": "200GB", "price": "440,000 تومان", "duration": "30 روزه", "description": "هشت لوکیشن فعال و پرسرعت در اختلال 🔥🚀", "tunnel": "TUNEL IRAN 🇸🇪🇩🇪", "locations": "🇸🇪 🇩🇪 🇨🇵 🇹🇷 🇨🇦 🇵🇱 🇳🇱 🇪🇸"}, {"id": "pasargad-300", "name": "#40 پاسارگاد", "volume": "300GB", "price": "615,000 تومان", "duration": "30 روزه", "description": "هشت لوکیشن فعال و پرسرعت در اختلال 🔥🚀", "tunnel": "TUNEL IRAN 🇸🇪🇩🇪", "locations": "🇸🇪 🇩🇪 🇨🇵 🇹🇷 🇨🇦 🇵🇱 🇳🇱 🇪🇸"}, {"id": "pasargad-500", "name": "#40 پاسارگاد", "volume": "500GB", "price": "900,000 تومان", "duration": "30 روزه", "description": "هشت لوکیشن فعال و پرسرعت در اختلال 🔥🚀", "tunnel": "TUNEL IRAN 🇸🇪🇩🇪", "locations": "🇸🇪 🇩🇪 🇨🇵 🇹🇷 🇨🇦 🇵🇱 🇳🇱 🇪🇸"}];
-const grid=document.getElementById("grid"), search=document.getElementById("search"), msg=document.getElementById("msg");
-function toast(t){msg.textContent=t;msg.style.display="block";setTimeout(()=>msg.style.display="none",2200)}
-function setFilter(v){search.value=v;render()}
-function relatedFor(p){return products.map((x,i)=>({...x,i})).filter(x=>x.name===p.name)}
-function render(){
- const q=search.value.trim().toLowerCase();
- const list=products.map((p,i)=>({...p,i})).filter(p=>Object.values(p).join(" ").toLowerCase().includes(q));
- grid.innerHTML=list.map(p=>{
-   const rel=relatedFor(p).map(r=>`<button class="rel" onclick="focusProduct(${r.i})">${r.volume}</button>`).join("");
-   return `<article class="card" id="product-${p.i}">
-   <span class="tag">${p.duration}</span><h2>${p.name} — ${p.volume}</h2>
-   <div class="price">${p.price}</div><div class="specs">📦 حجم: ${p.volume}<br>⏱ مدت: ${p.duration}<br>🌍 لوکیشن‌ها: ${p.locations}</div>
-   <div class="desc">${p.description}</div>${p.tunnel?`<div class="desc">🔗 ${p.tunnel}</div>`:""}
-   <div class="actions"><button class="action" onclick="makeSub('${p.id}')">🔗 ساخت لینک اشتراک</button></div>
-   <div class="related"><div class="related-title">محصولات مرتبط</div><div class="related-list">${rel}</div></div>
-   </article>`;
- }).join("") || "<p>محصولی پیدا نشد.</p>";
+
+let products=[];
+
+async function loadProducts(){
+
+try{
+
+const res=await fetch("/api/products");
+products=await res.json();
+
+const box=document.getElementById("products");
+
+if(!products.length){
+
+box.innerHTML='<div class="empty">در حال حاضر محصول فعالی وجود ندارد.</div>';
+
+return;
 }
-async function makeSub(id){
- try{
-  const r=await fetch("/api/subscription",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId:id})});
-  const d=await r.json(); if(!r.ok) throw new Error(d.error||"خطا");
-  const ok=confirm("لینک اشتراک ساخته شد.\n\n"+d.link+"\n\nبرای کپی کردن OK را بزنید.");
-  if(ok){await navigator.clipboard.writeText(d.link);toast("لینک اشتراک کپی شد ✅")}
- }catch(e){toast(e.message)}
+
+box.innerHTML=products.map(p=>`
+
+<div class="card">
+
+<h2>${esc(p.name)}</h2>
+
+<div class="price">${esc(p.price || "تماس بگیرید")}</div>
+
+<div class="info">
+
+<div>📦 حجم: ${esc(p.volume || "-")}</div>
+<div>⏱ مدت: ${esc(p.duration || "-")}</div>
+<div>📍 لوکیشن: ${esc(p.location || "-")}</div>
+<div>🔐 پروتکل: ${esc(p.protocol || "-")}</div>
+
+<p>${esc(p.description || "")}</p>
+
+</div>
+
+<button onclick="openOrder('${p.id}')">
+انتخاب این پلن
+</button>
+
+</div>
+
+`).join("");
+
+}catch(e){
+
+document.getElementById("products").innerHTML=
+'<div class="empty">خطا در دریافت محصولات.</div>';
+
 }
-function focusProduct(i){search.value="";render();setTimeout(()=>document.getElementById("product-"+i)?.scrollIntoView({behavior:"smooth",block:"center"}),50)}
-search.addEventListener("input",render);render();
-</script></body></html>
+
+}
+
+function esc(v){
+
+return String(v ?? "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+function openOrder(id){
+
+const p=products.find(x=>String(x.id)===String(id));
+
+if(!p)return;
+
+document.getElementById("productId").value=p.id;
+document.getElementById("modalTitle").textContent=
+"سفارش: "+p.name;
+
+document.getElementById("result").innerHTML="";
+document.getElementById("modal").style.display="block";
+
+}
+
+function closeModal(){
+
+document.getElementById("modal").style.display="none";
+
+}
+
+document.getElementById("orderForm").addEventListener("submit",async e=>{
+
+e.preventDefault();
+
+const body={
+productId:document.getElementById("productId").value,
+customerName:document.getElementById("customerName").value,
+contact:document.getElementById("contact").value,
+note:document.getElementById("note").value
+};
+
+const res=await fetch("/api/orders",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(body)
+});
+
+const data=await res.json();
+
+if(data.success){
+
+document.getElementById("result").innerHTML=
+'<div class="success">✅ سفارش شما ثبت شد. کد سفارش: '+esc(data.orderId)+'</div>';
+
+document.getElementById("orderForm").reset();
+
+}else{
+
+document.getElementById("result").innerHTML=
+'<div class="success" style="background:#3a1616;color:#ffaaaa">❌ '+esc(data.error)+'</div>';
+
+}
+
+});
+
+loadProducts();
+
+</script>
+
+</body>
+</html>

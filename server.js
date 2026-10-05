@@ -1,98 +1,252 @@
 const express = require("express");
-const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
+const HOST = "0.0.0.0";
+
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RZVPN-Admin-1405";
+
 const ROOT = __dirname;
+const PUBLIC_DIR = path.join(ROOT, "public");
 
 const PRODUCTS_FILE = path.join(ROOT, "products.json");
-const SUBS_FILE = path.join(ROOT, "subscriptions.json");
-const PRICING_FILE = path.join(ROOT, "pricing-links.json");
+const LINKS_FILE = path.join(ROOT, "pricing-links.json");
+const ORDERS_FILE = path.join(ROOT, "orders.json");
+const SUBSCRIPTIONS_FILE = path.join(ROOT, "subscriptions.json");
 
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(ROOT, "public")));
+app.use(express.static(PUBLIC_DIR));
+
+function ensureFile(file, defaultValue) {
+  if (!fs.existsSync(file)) {
+    fs.writeFileSync(file, JSON.stringify(defaultValue, null, 2), "utf8");
+  }
+}
+
+ensureFile(PRODUCTS_FILE, []);
+ensureFile(LINKS_FILE, []);
+ensureFile(ORDERS_FILE, []);
+ensureFile(SUBSCRIPTIONS_FILE, []);
 
 function readJSON(file, fallback) {
   try {
-    if (!fs.existsSync(file)) {
-      fs.writeFileSync(file, JSON.stringify(fallback, null, 2));
-      return fallback;
-    }
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch (e) {
-    console.error("JSON error:", e.message);
+    if (!fs.existsSync(file)) return fallback;
+    const text = fs.readFileSync(file, "utf8").trim();
+    if (!text) return fallback;
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("JSON READ ERROR:", file, err.message);
     return fallback;
   }
 }
 
-function saveJSON(file, data) {
+function writeJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf8");
 }
 
-function products() {
-  return readJSON(PRODUCTS_FILE, []);
+function id() {
+  return crypto.randomUUID();
 }
 
-function subscriptions() {
-  return readJSON(SUBS_FILE, []);
+function token(length = 24) {
+  return crypto.randomBytes(length).toString("hex");
 }
 
-function pricingLinks() {
-  return readJSON(PRICING_FILE, []);
+function clean(value) {
+  return String(value ?? "").trim();
 }
 
-function saveSubscriptions(data) {
-  saveJSON(SUBS_FILE, data);
+function publicProduct(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    volume: p.volume,
+    duration: p.duration,
+    location: p.location,
+    protocol: p.protocol,
+    description: p.description,
+    active: p.active !== false,
+    createdAt: p.createdAt
+  };
 }
 
-function savePricingLinks(data) {
-  saveJSON(PRICING_FILE, data);
+/* =========================
+   ADMIN AUTH
+========================= */
+
+function makeAdminToken() {
+  const payload = {
+    role: "admin",
+    exp: Date.now() + 1000 * 60 * 60 * 24 * 7
+  };
+
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+
+  const signature = crypto
+    .createHmac("sha256", ADMIN_PASSWORD)
+    .update(body)
+    .digest("base64url");
+
+  return `${body}.${signature}`;
 }
 
-function makeId() {
-  return crypto.randomBytes(8).toString("hex");
+function verifyAdminToken(value) {
+  try {
+    if (!value) return false;
+
+    const parts = value.split(".");
+    if (parts.length !== 2) return false;
+
+    const [body, signature] = parts;
+
+    const expected = crypto
+      .createHmac("sha256", ADMIN_PASSWORD)
+      .update(body)
+      .digest("base64url");
+
+    if (
+      signature.length !== expected.length ||
+      !crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expected)
+      )
+    ) {
+      return false;
+    }
+
+    const payload = JSON.parse(
+      Buffer.from(body, "base64url").toString("utf8")
+    );
+
+    return payload.role === "admin" && payload.exp > Date.now();
+  } catch {
+    return false;
+  }
 }
 
-function makeToken() {
-  return crypto.randomBytes(18).toString("hex");
+function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization || "";
+
+  if (auth.startsWith("Bearer ")) {
+    if (verifyAdminToken(auth.slice(7))) {
+      req.admin = true;
+      return next();
+    }
+  }
+
+  if (verifyAdminToken(req.cookies?.admin_token)) {
+    req.admin = true;
+    return next();
+  }
+
+  return res.status(401).json({
+    error: "دسترسی غیرمجاز است."
+  });
 }
+
+/*
+  بدون cookie-parser:
+  cookie را دستی می‌خوانیم.
+*/
+app.use((req, res, next) => {
+  req.cookies = {};
+
+  const cookieHeader = req.headers.cookie || "";
+
+  cookieHeader.split(";").forEach(part => {
+    const index = part.indexOf("=");
+
+    if (index > -1) {
+      const key = part.slice(0, index).trim();
+      const value = decodeURIComponent(part.slice(index + 1).trim());
+      req.cookies[key] = value;
+    }
+  });
+
+  next();
+});
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+app.post("/api/admin/login", (req, res) => {
+  const password = clean(req.body.password);
+
+  if (!password || password !== ADMIN_PASSWORD) {
+    return res.status(401).json({
+      success: false,
+      error: "رمز مدیریت اشتباه است."
+    });
+  }
+
+  const adminToken = makeAdminToken();
+
+  res.json({
+    success: true,
+    token: adminToken,
+    message: "ورود موفق بود."
+  });
+});
+
+app.get("/api/admin/check", requireAdmin, (req, res) => {
+  res.json({
+    success: true,
+    admin: true
+  });
+});
 
 /* =========================
    PRODUCTS
 ========================= */
 
 app.get("/api/products", (req, res) => {
-  res.json(products());
+  const products = readJSON(PRODUCTS_FILE, []);
+
+  const activeOnly = req.query.all !== "true";
+
+  const result = products
+    .filter(p => !activeOnly || p.active !== false)
+    .map(publicProduct);
+
+  res.json(result);
 });
 
-app.post("/api/products", (req, res) => {
-  const { name, price, volume, duration, description } = req.body;
+app.get("/api/admin/products", requireAdmin, (req, res) => {
+  const products = readJSON(PRODUCTS_FILE, []);
+  res.json(products);
+});
 
-  if (!name || !price || !volume || !duration) {
-    return res.status(400).json({
-      error: "نام، قیمت، حجم و مدت الزامی هستند."
-    });
-  }
-
-  const all = products();
+app.post("/api/admin/products", requireAdmin, (req, res) => {
+  const products = readJSON(PRODUCTS_FILE, []);
 
   const product = {
-    id: makeId(),
-    name: String(name),
-    price: String(price),
-    volume: String(volume),
-    duration: String(duration),
-    description: String(description || ""),
-    active: true,
+    id: id(),
+    name: clean(req.body.name),
+    price: clean(req.body.price),
+    volume: clean(req.body.volume),
+    duration: clean(req.body.duration),
+    location: clean(req.body.location),
+    protocol: clean(req.body.protocol),
+    description: clean(req.body.description),
+    active: req.body.active !== false,
     createdAt: new Date().toISOString()
   };
 
-  all.push(product);
+  if (!product.name) {
+    return res.status(400).json({
+      error: "نام محصول الزامی است."
+    });
+  }
 
-  saveJSON(PRODUCTS_FILE, all);
+  products.push(product);
+  writeJSON(PRODUCTS_FILE, products);
 
   res.json({
     success: true,
@@ -100,82 +254,47 @@ app.post("/api/products", (req, res) => {
   });
 });
 
-app.put("/api/products/:id", (req, res) => {
-  const all = products();
+app.put("/api/admin/products/:id", requireAdmin, (req, res) => {
+  const products = readJSON(PRODUCTS_FILE, []);
 
-  const index = all.findIndex(p => p.id === req.params.id);
+  const index = products.findIndex(
+    p => String(p.id) === String(req.params.id)
+  );
 
   if (index === -1) {
     return res.status(404).json({
-      error: "پلن پیدا نشد."
+      error: "محصول پیدا نشد."
     });
   }
 
-  const old = all[index];
+  const old = products[index];
 
-  all[index] = {
+  products[index] = {
     ...old,
-    name: req.body.name ?? old.name,
-    price: req.body.price ?? old.price,
-    volume: req.body.volume ?? old.volume,
-    duration: req.body.duration ?? old.duration,
-    description: req.body.description ?? old.description,
-    active:
-      typeof req.body.active === "boolean"
-        ? req.body.active
-        : old.active,
+    name: clean(req.body.name),
+    price: clean(req.body.price),
+    volume: clean(req.body.volume),
+    duration: clean(req.body.duration),
+    location: clean(req.body.location),
+    protocol: clean(req.body.protocol),
+    description: clean(req.body.description),
+    active: req.body.active !== false,
     updatedAt: new Date().toISOString()
   };
 
-  saveJSON(PRODUCTS_FILE, all);
+  writeJSON(PRODUCTS_FILE, products);
 
   res.json({
     success: true,
-    product: all[index]
+    product: products[index]
   });
 });
 
-app.delete("/api/products/:id", (req, res) => {
-  const all = products();
+app.post("/api/admin/products/:id/toggle", requireAdmin, (req, res) => {
+  const products = readJSON(PRODUCTS_FILE, []);
 
-  const exists = all.some(p => p.id === req.params.id);
-
-  if (!exists) {
-    return res.status(404).json({
-      error: "پلن پیدا نشد."
-    });
-  }
-
-  saveJSON(
-    PRODUCTS_FILE,
-    all.filter(p => p.id !== req.params.id)
-  );
-
-  res.json({ success: true });
-});
-
-/* =========================
-   SINGLE SUBSCRIPTIONS
-========================= */
-
-app.get("/api/subscriptions", (req, res) => {
-  const ps = products();
-
-  const result = subscriptions().map(sub => {
-    const product = ps.find(p => p.id === sub.productId);
-
-    return {
-      ...sub,
-      productName: product ? product.name : "نامشخص"
-    };
-  });
-
-  res.json(result);
-});
-
-app.post("/api/subscription", (req, res) => {
-  const product = products().find(
-    p => p.id === req.body.productId && p.active !== false
+  const product = products.find(
+    p => String(p.id) === String(req.params.id)
   );
 
   if (!product) {
@@ -184,589 +303,391 @@ app.post("/api/subscription", (req, res) => {
     });
   }
 
-  const token = makeToken();
+  product.active = product.active === false;
 
-  const sub = {
-    token,
-    productId: product.id,
-    createdAt: new Date().toISOString(),
-    active: true
-  };
-
-  const all = subscriptions();
-  all.push(sub);
-
-  saveSubscriptions(all);
-
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  writeJSON(PRODUCTS_FILE, products);
 
   res.json({
     success: true,
-    token,
-    link: `${baseUrl}/sub/${token}`,
-    rawLink: `${baseUrl}/sub/${token}/raw`
-  });
-});
-
-app.get("/api/subscription/:token", (req, res) => {
-  const sub = subscriptions().find(
-    s => s.token === req.params.token && s.active
-  );
-
-  if (!sub) {
-    return res.status(404).json({
-      error: "لینک اشتراک معتبر نیست."
-    });
-  }
-
-  const product = products().find(
-    p => p.id === sub.productId
-  );
-
-  res.json({
-    subscription: sub,
     product
   });
 });
 
-app.post("/api/subscription/:token/toggle", (req, res) => {
-  const all = subscriptions();
+app.delete("/api/admin/products/:id", requireAdmin, (req, res) => {
+  const products = readJSON(PRODUCTS_FILE, []);
 
-  const index = all.findIndex(
-    s => s.token === req.params.token
+  const filtered = products.filter(
+    p => String(p.id) !== String(req.params.id)
   );
 
-  if (index === -1) {
+  if (filtered.length === products.length) {
     return res.status(404).json({
-      error: "لینک پیدا نشد."
+      error: "محصول پیدا نشد."
     });
   }
 
-  all[index].active = !all[index].active;
-
-  saveSubscriptions(all);
+  writeJSON(PRODUCTS_FILE, filtered);
 
   res.json({
-    success: true,
-    subscription: all[index]
+    success: true
   });
 });
 
-app.delete("/api/subscription/:token", (req, res) => {
-  const all = subscriptions();
-
-  const filtered = all.filter(
-    s => s.token !== req.params.token
-  );
-
-  if (filtered.length === all.length) {
-    return res.status(404).json({
-      error: "لینک پیدا نشد."
-    });
-  }
-
-  saveSubscriptions(filtered);
-
-  res.json({ success: true });
-});
-
 /* =========================
-   GROUP PRICING LINKS
+   PRICING LINKS
 ========================= */
 
-app.get("/api/pricing-links", (req, res) => {
-  const ps = products();
-
-  const result = pricingLinks().map(link => ({
-    ...link,
-    products: link.productIds
-      .map(id => ps.find(p => p.id === id))
-      .filter(Boolean)
-  }));
-
-  res.json(result);
+app.get("/api/pricing-links", requireAdmin, (req, res) => {
+  const links = readJSON(LINKS_FILE, []);
+  res.json(links);
 });
 
-app.post("/api/pricing-links", (req, res) => {
-  let productIds = req.body.productIds;
+app.post("/api/pricing-links", requireAdmin, (req, res) => {
+  const productIds = Array.isArray(req.body.productIds)
+    ? req.body.productIds.map(String)
+    : [];
 
-  if (!Array.isArray(productIds)) {
+  if (!productIds.length) {
     return res.status(400).json({
-      error: "لیست پلن‌ها معتبر نیست."
+      error: "حداقل یک محصول انتخاب کنید."
     });
   }
 
-  productIds = [...new Set(productIds)];
+  const products = readJSON(PRODUCTS_FILE, []);
 
-  if (productIds.length < 2) {
+  const selected = products
+    .filter(p => productIds.includes(String(p.id)))
+    .filter(p => p.active !== false);
+
+  if (!selected.length) {
     return res.status(400).json({
-      error: "حداقل ۲ پلن را انتخاب کنید."
+      error: "محصول فعال پیدا نشد."
     });
   }
 
-  const ps = products();
-
-  const validProducts = productIds.filter(id =>
-    ps.some(p => p.id === id && p.active !== false)
-  );
-
-  if (validProducts.length !== productIds.length) {
-    return res.status(400).json({
-      error: "یکی از پلن‌های انتخاب‌شده وجود ندارد یا غیرفعال است."
-    });
-  }
-
-  const token = makeToken();
+  const links = readJSON(LINKS_FILE, []);
 
   const item = {
-    token,
-    productIds: validProducts,
-    createdAt: new Date().toISOString(),
-    active: true
+    id: id(),
+    token: token(12),
+    productIds: selected.map(p => p.id),
+    active: true,
+    createdAt: new Date().toISOString()
   };
 
-  const all = pricingLinks();
-  all.push(item);
-
-  savePricingLinks(all);
-
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  links.push(item);
+  writeJSON(LINKS_FILE, links);
 
   res.json({
     success: true,
-    token,
-    link: `${baseUrl}/pricing/${token}`
+    link: item,
+    url: `/pricing/${item.token}`
   });
 });
 
-app.post("/api/pricing-links/:token/toggle", (req, res) => {
-  const all = pricingLinks();
+app.post("/api/pricing-links/:token/toggle", requireAdmin, (req, res) => {
+  const links = readJSON(LINKS_FILE, []);
 
-  const index = all.findIndex(
-    x => x.token === req.params.token
-  );
-
-  if (index === -1) {
-    return res.status(404).json({
-      error: "لینک پیدا نشد."
-    });
-  }
-
-  all[index].active = !all[index].active;
-
-  savePricingLinks(all);
-
-  res.json({
-    success: true,
-    pricingLink: all[index]
-  });
-});
-
-app.delete("/api/pricing-links/:token", (req, res) => {
-  const all = pricingLinks();
-
-  const filtered = all.filter(
-    x => x.token !== req.params.token
-  );
-
-  if (filtered.length === all.length) {
-    return res.status(404).json({
-      error: "لینک پیدا نشد."
-    });
-  }
-
-  savePricingLinks(filtered);
-
-  res.json({ success: true });
-});
-
-/* =========================
-   PUBLIC GROUP PRICE PAGE
-========================= */
-
-app.get("/pricing/:token", (req, res) => {
-  const link = pricingLinks().find(
-    x => x.token === req.params.token && x.active
+  const link = links.find(
+    x => String(x.token) === String(req.params.token)
   );
 
   if (!link) {
-    return res.status(404).send(`
-<!doctype html>
-<html lang="fa" dir="rtl">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RZVPN</title>
-<body style="
-margin:0;
-background:#080b12;
-color:#fff;
-font-family:Tahoma;
-text-align:center;
-padding:70px 20px">
-<h2>❌ لینک قیمت معتبر نیست</h2>
-</body>
-</html>
-`);
+    return res.status(404).json({
+      error: "لینک پیدا نشد."
+    });
   }
 
-  const ps = products();
+  link.active = link.active === false;
 
-  const selectedProducts = link.productIds
-    .map(id => ps.find(p => p.id === id))
-    .filter(p => p && p.active !== false);
+  writeJSON(LINKS_FILE, links);
 
-  const safe = value =>
-    String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+  res.json({
+    success: true,
+    link
+  });
+});
 
-  const cards = selectedProducts.map(p => `
-<div class="plan">
+app.delete("/api/pricing-links/:token", requireAdmin, (req, res) => {
+  const links = readJSON(LINKS_FILE, []);
 
-  <div class="plan-title">
-    ${safe(p.name)}
-  </div>
+  const filtered = links.filter(
+    x => String(x.token) !== String(req.params.token)
+  );
 
-  <div class="price">
-    ${safe(p.price)}
-  </div>
-
-  <div class="info">
-    📦 حجم: <b>${safe(p.volume)}</b>
-  </div>
-
-  <div class="info">
-    ⏱ مدت: <b>${safe(p.duration)}</b>
-  </div>
-
-  ${
-    p.description
-      ? `<div class="desc">${safe(p.description)}</div>`
-      : ""
+  if (filtered.length === links.length) {
+    return res.status(404).json({
+      error: "لینک پیدا نشد."
+    });
   }
 
-  <button onclick="selectPlan('${safe(p.id)}')">
-    انتخاب این پلن
-  </button>
+  writeJSON(LINKS_FILE, filtered);
 
-</div>
-`).join("");
+  res.json({
+    success: true
+  });
+});
 
-  res.send(`
-<!doctype html>
-<html lang="fa" dir="rtl">
+app.get("/api/pricing/:token", (req, res) => {
+  const links = readJSON(LINKS_FILE, []);
 
-<head>
+  const link = links.find(
+    x => String(x.token) === String(req.params.token)
+  );
 
-<meta charset="utf-8">
+  if (!link || link.active === false) {
+    return res.status(404).json({
+      error: "این لینک فعال نیست."
+    });
+  }
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+  const products = readJSON(PRODUCTS_FILE, []);
 
-<title>قیمت‌های RZVPN</title>
+  const selected = products
+    .filter(p => link.productIds.includes(p.id))
+    .filter(p => p.active !== false)
+    .map(publicProduct);
 
-<style>
-
-*{
- box-sizing:border-box;
-}
-
-body{
- margin:0;
- min-height:100vh;
- padding:25px 14px 50px;
-
- background:
- radial-gradient(
-   circle at top,
-   #18233b 0,
-   #080b12 48%
- );
-
- color:#fff;
-
- font-family:
- Tahoma,
- Arial,
- sans-serif;
-}
-
-.container{
- width:min(1000px,100%);
- margin:auto;
-}
-
-.header{
- text-align:center;
- padding:20px;
- margin-bottom:20px;
-}
-
-.logo{
- font-size:36px;
- font-weight:900;
-}
-
-.subtitle{
- color:#94a3b8;
- margin-top:8px;
-}
-
-.badge{
- display:inline-block;
- margin-top:15px;
- padding:8px 14px;
- border-radius:999px;
- background:#172554;
- color:#93c5fd;
- font-weight:800;
-}
-
-.plans{
- display:grid;
- grid-template-columns:
- repeat(auto-fit,minmax(240px,1fr));
- gap:16px;
-}
-
-.plan{
- background:#111827;
- border:1px solid #263449;
- border-radius:22px;
- padding:22px;
- box-shadow:0 15px 45px #0007;
-}
-
-.plan-title{
- font-size:20px;
- font-weight:900;
- margin-bottom:12px;
-}
-
-.price{
- color:#60a5fa;
- font-size:26px;
- font-weight:900;
- margin-bottom:18px;
-}
-
-.info{
- padding:10px 0;
- border-bottom:1px solid #263244;
- color:#cbd5e1;
-}
-
-.desc{
- color:#94a3b8;
- line-height:1.9;
- margin-top:14px;
-}
-
-button{
- width:100%;
- border:0;
- border-radius:13px;
- padding:14px;
- margin-top:18px;
-
- background:#2563eb;
- color:#fff;
-
- font-family:inherit;
- font-weight:900;
- font-size:15px;
-}
-
-button:active{
- transform:scale(.98);
-}
-
-.footer{
- text-align:center;
- color:#64748b;
- margin-top:30px;
- font-size:13px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="header">
-
-<div class="logo">RZVPN ⚡</div>
-
-<div class="subtitle">
-ارائه دهنده خدمات RZVPN
-</div>
-
-<div class="badge">
-پلن‌های موجود
-</div>
-
-</div>
-
-<div class="plans">
-${cards}
-</div>
-
-<div class="footer">
-RZVPN © ${new Date().getFullYear()}
-</div>
-
-</div>
-
-<script>
-
-function selectPlan(id){
-
- alert(
- "پلن انتخاب شد.\\n\\n" +
- "شناسه پلن: " + id +
- "\\n\\nمرحله اتصال به پرداخت و صدور اشتراک در نسخه بعدی اضافه می‌شود."
- );
-
-}
-
-</script>
-
-</body>
-</html>
-`);
+  res.json({
+    success: true,
+    products: selected
+  });
 });
 
 /* =========================
-   SINGLE SUB PAGE
+   ORDERS
 ========================= */
 
-app.get("/sub/:token", (req, res) => {
-  const sub = subscriptions().find(
-    s => s.token === req.params.token && s.active
-  );
+app.get("/api/admin/orders", requireAdmin, (req, res) => {
+  const orders = readJSON(ORDERS_FILE, []);
 
-  if (!sub) {
-    return res.status(404).send("لینک اشتراک معتبر نیست");
+  res.json(
+    orders.sort(
+      (a, b) =>
+        new Date(b.createdAt) - new Date(a.createdAt)
+    )
+  );
+});
+
+app.post("/api/orders", (req, res) => {
+  const productId = clean(req.body.productId);
+  const customerName = clean(req.body.customerName);
+  const contact = clean(req.body.contact);
+  const note = clean(req.body.note);
+
+  if (!productId || !customerName || !contact) {
+    return res.status(400).json({
+      error: "نام، راه ارتباطی و محصول الزامی است."
+    });
   }
 
-  const product = products().find(
-    p => p.id === sub.productId
+  const products = readJSON(PRODUCTS_FILE, []);
+
+  const product = products.find(
+    p => String(p.id) === productId && p.active !== false
   );
 
   if (!product) {
-    return res.status(404).send("محصول پیدا نشد");
+    return res.status(404).json({
+      error: "محصول انتخاب‌شده موجود نیست."
+    });
   }
 
-  const safe = value =>
-    String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+  const orders = readJSON(ORDERS_FILE, []);
 
-  res.send(`
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>اشتراک RZVPN</title>
-<style>
-body{
- margin:0;
- background:#080b12;
- color:#fff;
- font-family:Tahoma;
- padding:25px 15px;
-}
-.box{
- max-width:520px;
- margin:auto;
- background:#111827;
- border:1px solid #263449;
- border-radius:22px;
- padding:25px;
-}
-.logo{
- font-size:30px;
- font-weight:900;
-}
-.row{
- padding:14px 0;
- border-bottom:1px solid #263244;
-}
-.ok{
- color:#22c55e;
- font-weight:900;
-}
-.price{
- color:#60a5fa;
- font-size:26px;
- font-weight:900;
-}
-</style>
-</head>
-<body>
-<div class="box">
-<div class="logo">RZVPN</div>
-<p>${safe(product.name)}</p>
-<div class="row">💰 قیمت: <b class="price">${safe(product.price)}</b></div>
-<div class="row">📦 حجم: <b>${safe(product.volume)}</b></div>
-<div class="row">⏱ مدت: <b>${safe(product.duration)}</b></div>
-<div class="row">وضعیت: <span class="ok">● فعال</span></div>
-</div>
-</body>
-</html>
-`);
+  const order = {
+    id: id(),
+    customerName,
+    contact,
+    note,
+    productId: product.id,
+    productName: product.name,
+    productPrice: product.price,
+    status: "جدید",
+    createdAt: new Date().toISOString()
+  };
+
+  orders.unshift(order);
+
+  writeJSON(ORDERS_FILE, orders);
+
+  res.json({
+    success: true,
+    message: "سفارش شما با موفقیت ثبت شد.",
+    orderId: order.id
+  });
 });
 
-app.get("/sub/:token/raw", (req, res) => {
-  const sub = subscriptions().find(
-    s => s.token === req.params.token && s.active
+app.post("/api/admin/orders/:id/status", requireAdmin, (req, res) => {
+  const orders = readJSON(ORDERS_FILE, []);
+
+  const order = orders.find(
+    x => String(x.id) === String(req.params.id)
   );
 
-  if (!sub) {
-    return res
-      .status(404)
-      .type("text/plain")
-      .send("INVALID_SUBSCRIPTION");
+  if (!order) {
+    return res.status(404).json({
+      error: "سفارش پیدا نشد."
+    });
   }
 
-  res.type("text/plain").send(
-`# RZVPN subscription
-# Product: ${sub.productId}
-# Real VPN server configurations will be added here.
-`
+  const allowed = [
+    "جدید",
+    "در حال بررسی",
+    "تکمیل شده",
+    "لغو شده"
+  ];
+
+  const status = clean(req.body.status);
+
+  if (!allowed.includes(status)) {
+    return res.status(400).json({
+      error: "وضعیت نامعتبر است."
+    });
+  }
+
+  order.status = status;
+  order.updatedAt = new Date().toISOString();
+
+  writeJSON(ORDERS_FILE, orders);
+
+  res.json({
+    success: true,
+    order
+  });
+});
+
+app.delete("/api/admin/orders/:id", requireAdmin, (req, res) => {
+  const orders = readJSON(ORDERS_FILE, []);
+
+  const filtered = orders.filter(
+    x => String(x.id) !== String(req.params.id)
   );
+
+  if (filtered.length === orders.length) {
+    return res.status(404).json({
+      error: "سفارش پیدا نشد."
+    });
+  }
+
+  writeJSON(ORDERS_FILE, filtered);
+
+  res.json({
+    success: true
+  });
 });
 
 /* =========================
-   ADMIN
+   OLD SUBSCRIPTION APIs
 ========================= */
 
-app.get("/admin", (req, res) => {
-  res.sendFile(
-    path.join(ROOT, "public", "admin.html")
+app.get("/api/subscriptions", requireAdmin, (req, res) => {
+  res.json(readJSON(SUBSCRIPTIONS_FILE, []));
+});
+
+app.post("/api/subscription", requireAdmin, (req, res) => {
+  const subscriptions = readJSON(SUBSCRIPTIONS_FILE, []);
+
+  const item = {
+    id: id(),
+    token: token(16),
+    ...req.body,
+    active: true,
+    createdAt: new Date().toISOString()
+  };
+
+  subscriptions.push(item);
+
+  writeJSON(SUBSCRIPTIONS_FILE, subscriptions);
+
+  res.json({
+    success: true,
+    subscription: item
+  });
+});
+
+app.get("/api/subscription/:token", (req, res) => {
+  const subscriptions = readJSON(SUBSCRIPTIONS_FILE, []);
+
+  const item = subscriptions.find(
+    x => String(x.token) === String(req.params.token)
   );
+
+  if (!item || item.active === false) {
+    return res.status(404).json({
+      error: "اشتراک پیدا نشد."
+    });
+  }
+
+  res.json(item);
+});
+
+app.post("/api/subscription/:token/toggle", requireAdmin, (req, res) => {
+  const subscriptions = readJSON(SUBSCRIPTIONS_FILE, []);
+
+  const item = subscriptions.find(
+    x => String(x.token) === String(req.params.token)
+  );
+
+  if (!item) {
+    return res.status(404).json({
+      error: "اشتراک پیدا نشد."
+    });
+  }
+
+  item.active = item.active === false;
+
+  writeJSON(SUBSCRIPTIONS_FILE, subscriptions);
+
+  res.json({
+    success: true,
+    subscription: item
+  });
+});
+
+app.delete("/api/subscription/:token", requireAdmin, (req, res) => {
+  const subscriptions = readJSON(SUBSCRIPTIONS_FILE, []);
+
+  const filtered = subscriptions.filter(
+    x => String(x.token) !== String(req.params.token)
+  );
+
+  writeJSON(SUBSCRIPTIONS_FILE, filtered);
+
+  res.json({
+    success: true
+  });
+});
+
+/* =========================
+   PUBLIC PAGES
+========================= */
+
+app.get("/pricing/:token", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "pricing.html"));
+});
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "admin.html"));
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(
-    path.join(ROOT, "public", "index.html")
-  );
+  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+/* =========================
+   SERVER
+========================= */
+
+app.listen(PORT, HOST, () => {
   console.log("");
-  console.log("=================================");
-  console.log(" RZVPN Subscription System v3");
-  console.log(` http://localhost:${PORT}`);
-  console.log(` Admin: http://localhost:${PORT}/admin`);
-  console.log("=================================");
+  console.log("====================================");
+  console.log(" RZVPN Public Website");
+  console.log("====================================");
+  console.log(`Local:  http://localhost:${PORT}`);
+  console.log(`Admin:  http://localhost:${PORT}/admin`);
+  console.log(`PORT:   ${PORT}`);
+  console.log("HOST:   0.0.0.0");
+  console.log("====================================");
   console.log("");
 });

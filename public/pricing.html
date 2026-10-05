@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RZVPN | قیمت‌ها</title>
+
+<style>
+body{
+margin:0;
+background:#070812;
+color:#fff;
+font-family:Tahoma,Arial;
+}
+header{
+text-align:center;
+padding:25px;
+background:#0d1020;
+border-bottom:1px solid #272d4b;
+}
+.logo{
+font-size:32px;
+font-weight:bold;
+color:#54b8ff;
+}
+.container{
+max-width:1000px;
+margin:auto;
+padding:25px 15px;
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+}
+.card{
+background:#111526;
+border:1px solid #29304e;
+border-radius:20px;
+padding:20px;
+}
+.price{
+font-size:27px;
+color:#55b7ff;
+font-weight:bold;
+margin:15px 0;
+}
+.info{
+line-height:2;
+color:#c8cce0;
+}
+button{
+width:100%;
+padding:13px;
+border:0;
+border-radius:12px;
+background:#168cff;
+color:#fff;
+font-weight:bold;
+font-size:15px;
+margin-top:12px;
+cursor:pointer;
+}
+.empty{
+text-align:center;
+padding:50px;
+color:#999;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">RZVPN</div>
+<div>لیست پلن‌های موجود</div>
+</header>
+
+<div class="container">
+
+<div id="products" class="grid">
+<div class="empty">در حال بارگذاری...</div>
+</div>
+
+</div>
+
+<script>
+
+function esc(v){
+return String(v ?? "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
+
+async function load(){
+
+const token=location.pathname.split("/").pop();
+
+try{
+
+const res=await fetch("/api/pricing/"+encodeURIComponent(token));
+const data=await res.json();
+
+if(!res.ok)throw new Error(data.error);
+
+if(!data.products.length){
+
+document.getElementById("products").innerHTML=
+'<div class="empty">این لینک محصول فعالی ندارد.</div>';
+
+return;
+}
+
+document.getElementById("products").innerHTML=
+data.products.map(p=>`
+
+<div class="card">
+
+<h2>${esc(p.name)}</h2>
+
+<div class="price">${esc(p.price || "تماس بگیرید")}</div>
+
+<div class="info">
+<div>📦 حجم: ${esc(p.volume || "-")}</div>
+<div>⏱ مدت: ${esc(p.duration || "-")}</div>
+<div>📍 لوکیشن: ${esc(p.location || "-")}</div>
+<div>🔐 پروتکل: ${esc(p.protocol || "-")}</div>
+<p>${esc(p.description || "")}</p>
+</div>
+
+<button onclick="location.href='/'">
+ثبت سفارش
+</button>
+
+</div>
+
+`).join("");
+
+}catch(e){
+
+document.getElementById("products").innerHTML=
+'<div class="empty">❌ این لینک وجود ندارد یا غیرفعال شده است.</div>';
+
+}
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
