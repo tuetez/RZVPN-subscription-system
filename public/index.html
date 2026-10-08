@@ -1,227 +1,491 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RZVPN | خدمات حرفه‌ای VPN</title>
-<meta name="theme-color" content="#070a12">
+<title>RZVPN | سرویس‌های VPN</title>
+
 <style>
 *{box-sizing:border-box}
-:root{
- --bg:#060810;--card:#0d1220;--card2:#11182a;
- --text:#f5f7ff;--muted:#9da8bd;--blue:#18b7ff;
- --purple:#8b5cf6;--border:#ffffff12;
-}
+html{scroll-behavior:smooth}
 body{
- margin:0;background:
- radial-gradient(circle at 10% 0%,#14345a55,transparent 30%),
- radial-gradient(circle at 90% 15%,#6126a844,transparent 28%),var(--bg);
- color:var(--text);font-family:Tahoma,Arial,sans-serif;
+ margin:0;
+ background:#050816;
+ color:#f5f7ff;
+ font-family:Tahoma,Arial,sans-serif;
 }
-a{text-decoration:none;color:inherit}
-.container{width:min(1150px,92%);margin:auto}
+body:before{
+ content:"";
+ position:fixed;
+ inset:0;
+ pointer-events:none;
+ background:
+ radial-gradient(circle at 15% 10%,#1647a522,transparent 30%),
+ radial-gradient(circle at 85% 20%,#6c28d922,transparent 30%);
+}
+.container{width:min(1180px,94%);margin:auto}
+
+header{
+ position:sticky;
+ top:0;
+ z-index:20;
+ background:#070b18dd;
+ backdrop-filter:blur(18px);
+ border-bottom:1px solid #ffffff12;
+}
 .nav{
- position:sticky;top:0;z-index:20;background:#060810d9;
- backdrop-filter:blur(18px);border-bottom:1px solid var(--border)
+ min-height:72px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:20px;
 }
-.navin{height:72px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:28px;font-weight:900;letter-spacing:1px}
-.logo span{color:var(--blue)}
-.navlinks{display:flex;gap:10px}
-.navlinks a,.navbtn{
- padding:10px 16px;border-radius:12px;color:#dbe5f5;
- border:1px solid transparent
+.logo{
+ font-size:27px;
+ font-weight:900;
+ letter-spacing:1px;
 }
-.navlinks a:hover{background:#ffffff09;border-color:#ffffff12}
-.hero{padding:70px 0 45px}
-.heroGrid{display:grid;grid-template-columns:1.3fr .7fr;gap:30px;align-items:center}
+.logo span{color:#35d9ff}
+.nav a{
+ color:#cdd5e8;
+ text-decoration:none;
+ margin-left:18px;
+ font-size:14px;
+}
+.nav a:hover{color:#35d9ff}
+
+.hero{
+ padding:70px 0 35px;
+ text-align:center;
+}
 .badge{
- display:inline-flex;padding:8px 13px;border-radius:999px;
- background:#18b7ff12;border:1px solid #18b7ff33;color:#72d7ff;font-size:13px
+ display:inline-block;
+ padding:8px 15px;
+ border-radius:30px;
+ background:#14224a;
+ border:1px solid #2d63c955;
+ color:#72ddff;
+ font-size:13px;
 }
-h1{font-size:clamp(38px,7vw,72px);line-height:1.05;margin:18px 0}
-h1 span{background:linear-gradient(90deg,#fff,#4fd1ff,#a78bfa);
- -webkit-background-clip:text;color:transparent}
-.hero p{font-size:18px;color:var(--muted);line-height:2;max-width:650px}
-.heroActions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}
-.btn{
- display:inline-flex;align-items:center;justify-content:center;
- padding:14px 20px;border-radius:14px;font-weight:bold
+.hero h1{
+ font-size:clamp(32px,6vw,62px);
+ margin:20px 0 12px;
+ line-height:1.25;
 }
-.primary{background:linear-gradient(135deg,#08a9f5,#7657f6);box-shadow:0 10px 35px #4c72ff2b}
-.secondary{border:1px solid var(--border);background:#ffffff08}
-.orb{
- height:330px;border-radius:50%;position:relative;
- background:radial-gradient(circle,#1c8cff33 0,#6f45ff18 40%,transparent 68%);
- border:1px solid #ffffff0c
+.hero h1 span{
+ color:#35d9ff;
 }
-.orb:before{
- content:"";position:absolute;inset:35px;border-radius:50%;
- border:2px solid #27baff55;box-shadow:0 0 70px #168fff44
+.hero p{
+ color:#aeb9d0;
+ max-width:680px;
+ margin:auto;
+ line-height:2;
 }
-.shield{position:absolute;inset:0;display:grid;place-items:center;font-size:125px;
- filter:drop-shadow(0 0 30px #26aaff88)}
-.section{padding:30px 0 65px}
-.sectionHead{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}
-.sectionHead h2{font-size:28px;margin:0}
-.sectionHead p{color:var(--muted);margin:8px 0 0}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.product{
- position:relative;overflow:hidden;background:linear-gradient(145deg,#101727,#0a0e19);
- border:1px solid var(--border);border-radius:22px;padding:22px;
- box-shadow:0 15px 45px #00000035;transition:.25s
+
+.tools{
+ margin:25px 0;
+ display:flex;
+ flex-wrap:wrap;
+ gap:10px;
 }
-.product:hover{transform:translateY(-5px);border-color:#25bfff55;box-shadow:0 20px 55px #168fff18}
-.product:before{content:"";position:absolute;top:0;right:0;left:0;height:2px;
- background:linear-gradient(90deg,#16bfff,#8755ff)}
-.product h3{margin:0 0 16px;font-size:21px}
-.price{font-size:28px;font-weight:900;color:#62d4ff;margin-bottom:15px}
-.infoRow{padding:8px 0;color:#c4cede;border-bottom:1px solid #ffffff08;font-size:14px}
-.desc{color:#929db2;line-height:1.9;min-height:55px;margin:12px 0 0}
-.empty,.error{padding:25px;text-align:center;background:#ffffff05;border:1px dashed #ffffff15;border-radius:16px;color:var(--muted)}
+.search{
+ flex:1;
+ min-width:230px;
+ background:#0d1428;
+ border:1px solid #ffffff16;
+ color:#fff;
+ padding:15px 18px;
+ border-radius:15px;
+ outline:none;
+}
+.search:focus{border-color:#35d9ff66}
+.filter{
+ background:#0d1428;
+ color:#dce5f7;
+ border:1px solid #ffffff16;
+ padding:13px 18px;
+ border-radius:14px;
+ cursor:pointer;
+}
+.filter.active{
+ background:#1558a8;
+ border-color:#35d9ff;
+ color:white;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+ gap:18px;
+}
+
+.card{
+ position:relative;
+ background:linear-gradient(145deg,#10182e,#090e20);
+ border:1px solid #ffffff12;
+ border-radius:24px;
+ padding:24px;
+ overflow:hidden;
+ box-shadow:0 18px 60px #0005;
+ transition:.25s;
+}
+.card:hover{
+ transform:translateY(-5px);
+ border-color:#35d9ff44;
+ box-shadow:0 20px 70px #008cff20;
+}
+.card:before{
+ content:"";
+ position:absolute;
+ width:130px;
+ height:130px;
+ right:-60px;
+ top:-60px;
+ background:#35d9ff18;
+ border-radius:50%;
+}
+.top{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+}
+.tag{
+ background:#1b2c65;
+ color:#8ddfff;
+ padding:7px 11px;
+ border-radius:10px;
+ font-size:12px;
+}
+.name{
+ font-size:20px;
+ font-weight:900;
+}
+.price{
+ font-size:29px;
+ font-weight:900;
+ color:#35d9ff;
+ margin:22px 0;
+}
+.price small{
+ font-size:13px;
+ color:#8793aa;
+}
+.info{
+ display:grid;
+ gap:11px;
+ color:#cbd4e8;
+ font-size:14px;
+ line-height:1.7;
+}
+.desc{
+ color:#929db5;
+ line-height:1.9;
+ margin-top:16px;
+ min-height:55px;
+}
+.locations{
+ color:#dbe4f7;
+ line-height:2;
+}
+
 .contact{
- display:grid;grid-template-columns:repeat(3,1fr);gap:15px
+ margin:55px 0 35px;
 }
-.contactBox{
- background:linear-gradient(145deg,#101625,#0b0f1b);
- border:1px solid var(--border);border-radius:18px;padding:20px
+.contact h2{
+ font-size:27px;
 }
-.contactIcon{font-size:28px;margin-bottom:10px}
-.contactBox small{display:block;color:#8e99ae;margin-bottom:6px}
-.contactBox strong{font-size:16px}
-.footer{border-top:1px solid var(--border);padding:25px 0;color:#7f8aa0;text-align:center}
-@media(max-width:800px){
- .heroGrid{grid-template-columns:1fr}.orb{height:220px;width:220px;margin:auto}
- .grid{grid-template-columns:1fr}
- .contact{grid-template-columns:1fr}
- .navlinks a:first-child{display:none}
+.contact-grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+ gap:15px;
+}
+.contact-card{
+ background:#0c1428;
+ border:1px solid #ffffff12;
+ border-radius:18px;
+ padding:20px;
+}
+.contact-card b{
+ display:block;
+ color:#35d9ff;
+ margin-bottom:9px;
+}
+.contact-card span{
+ color:#cbd4e8;
+ word-break:break-word;
+}
+
+footer{
+ border-top:1px solid #ffffff12;
+ margin-top:60px;
+ padding:25px 0;
+ text-align:center;
+ color:#69758e;
+ font-size:13px;
+}
+
+.empty{
+ text-align:center;
+ padding:50px;
+ color:#8e99b0;
+ background:#0b1224;
+ border-radius:20px;
+}
+
+@media(max-width:650px){
+ .nav{min-height:62px}
+ .nav a{display:none}
  .hero{padding-top:45px}
+ .card{padding:20px}
+ .price{font-size:26px}
 }
 </style>
 </head>
+
 <body>
 
-<nav class="nav">
- <div class="container navin">
-  <a class="logo" href="/">RZ<span>VPN</span></a>
-  <div class="navlinks">
-   <a href="#products">💰 قیمت‌ها</a>
-   <a href="#contact">📞 ارتباط با ما</a>
-  </div>
+<header>
+ <div class="container nav">
+  <div class="logo">RZ<span>VPN</span></div>
+  <nav>
+   <a href="#products">محصولات</a>
+   <a href="#contact">ارتباط با ما</a>
+  </nav>
  </div>
-</nav>
+</header>
 
-<main>
+<main class="container">
+
 <section class="hero">
- <div class="container heroGrid">
-  <div>
-   <div class="badge">🛡️ سرویس حرفه‌ای RZVPN</div>
-   <h1>اتصال سریع،<br><span>پایدار و حرفه‌ای</span></h1>
-   <p id="provider">ارائه‌دهنده خدمات RZVPN</p>
-   <div class="heroActions">
-    <a class="btn primary" href="#products">مشاهده لیست قیمت‌ها</a>
-    <a class="btn secondary" href="#contact">ارتباط با ما</a>
-   </div>
+ <div class="badge">⚡ سرویس‌های فعال RZVPN</div>
+ <h1>اتصال سریع، پایدار و <span>حرفه‌ای</span></h1>
+ <p>
+  لیست آخرین سرویس‌ها و پلن‌های RZVPN را مشاهده کنید.
+  قیمت‌ها و مشخصات هر سرویس در این صفحه نمایش داده می‌شود.
+ </p>
+</section>
+
+<section id="products">
+
+ <div class="tools">
+  <input
+   id="search"
+   class="search"
+   placeholder="🔎 جستجوی محصول، حجم یا نام..."
+   oninput="render()"
+  >
+
+  <button class="filter active" data-filter="all" onclick="setFilter('all',this)">
+   همه محصولات
+  </button>
+
+  <button class="filter" data-filter="pasargad" onclick="setFilter('pasargad',this)">
+   #40 پاسارگاد
+  </button>
+
+  <button class="filter" data-filter="rebecca" onclick="setFilter('rebecca',this)">
+   #14 ربکا
+  </button>
+ </div>
+
+ <div id="productsGrid" class="grid">
+  <div class="empty">در حال دریافت محصولات...</div>
+ </div>
+
+</section>
+
+<section id="contact" class="contact">
+ <h2>📞 ارتباط با ما</h2>
+
+ <div class="contact-grid">
+
+  <div class="contact-card">
+   <b>📢 کانال بله</b>
+   <span id="baleChannel">در حال دریافت...</span>
   </div>
-  <div class="orb"><div class="shield">🛡️</div></div>
+
+  <div class="contact-card">
+   <b>👤 آیدی بله</b>
+   <span id="baleId">در حال دریافت...</span>
+  </div>
+
+  <div class="contact-card">
+   <b>📸 اینستاگرام</b>
+   <span id="instagram">در حال دریافت...</span>
+  </div>
+
+  <div class="contact-card">
+   <b>🛡️ ارائه‌دهنده خدمات</b>
+   <span id="provider">RZVPN</span>
+  </div>
+
  </div>
 </section>
 
-<section class="section" id="products">
- <div class="container">
-  <div class="sectionHead">
-   <div>
-    <h2>🔥 محصولات RZVPN</h2>
-    <p>پلن‌های فعال و موجود</p>
-   </div>
-  </div>
-  <div id="productsBox" class="grid">
-   <div class="empty">در حال دریافت محصولات...</div>
-  </div>
- </div>
-</section>
-
-<section class="section" id="contact">
- <div class="container">
-  <div class="sectionHead">
-   <div>
-    <h2>📞 ارتباط با ما</h2>
-    <p>برای اطلاعات بیشتر با ما در ارتباط باشید</p>
-   </div>
-  </div>
-  <div class="contact">
-   <div class="contactBox">
-    <div class="contactIcon">📢</div>
-    <small>کانال بله</small>
-    <strong id="baleChannel">—</strong>
-   </div>
-   <div class="contactBox">
-    <div class="contactIcon">👤</div>
-    <small>آیدی بله</small>
-    <strong id="baleId">—</strong>
-   </div>
-   <div class="contactBox">
-    <div class="contactIcon">📸</div>
-    <small>اینستاگرام</small>
-    <strong id="instagram">—</strong>
-   </div>
-  </div>
- </div>
-</section>
 </main>
 
-<footer class="footer">
- <div class="container">© RZVPN — ارائه‌دهنده خدمات حرفه‌ای RZVPN</div>
+<footer>
+ © <span id="year"></span> RZVPN — تمامی حقوق محفوظ است.
 </footer>
 
 <script>
-const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-}[m]));
+let products=[];
+let filter="all";
+let settings={};
 
-async function loadSettings(){
- try{
-  const r=await fetch("/api/settings");
-  if(!r.ok)return;
-  const s=await r.json();
-  document.getElementById("provider").textContent=s.provider||"ارائه‌دهنده خدمات RZVPN";
-  document.getElementById("baleChannel").textContent=s.baleChannel||"—";
-  document.getElementById("baleId").textContent=s.baleId||"—";
-  document.getElementById("instagram").textContent=s.instagram||"—";
- }catch(e){}
+function esc(v){
+ return String(v ?? "")
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;")
+  .replace(/'/g,"&#039;");
+}
+
+function setFilter(type,button){
+ filter=type;
+
+ document.querySelectorAll(".filter")
+  .forEach(x=>x.classList.remove("active"));
+
+ button.classList.add("active");
+ render();
+}
+
+function render(){
+
+ const grid=document.getElementById("productsGrid");
+
+ const q=document
+  .getElementById("search")
+  .value
+  .trim()
+  .toLowerCase();
+
+ let list=products.filter(p=>p.active!==false);
+
+ if(filter!=="all"){
+  list=list.filter(p=>{
+   const name=String(p.name||"").toLowerCase();
+
+   if(filter==="pasargad")
+    return name.includes("پاسارگاد");
+
+   if(filter==="rebecca")
+    return name.includes("ربکا");
+
+   return true;
+  });
+ }
+
+ if(q){
+  list=list.filter(p=>{
+   const text=[
+    p.name,p.price,p.volume,p.duration,
+    p.location,p.locations,p.protocol,
+    p.tunnel,p.description
+   ].join(" ").toLowerCase();
+
+   return text.includes(q);
+  });
+ }
+
+ if(!list.length){
+  grid.innerHTML='<div class="empty">محصولی مطابق جستجو پیدا نشد.</div>';
+  return;
+ }
+
+ grid.innerHTML=list.map(p=>`
+
+  <article class="card">
+
+   <div class="top">
+    <div class="name">${esc(p.name)}</div>
+    <div class="tag">${esc(p.duration||"فعال")}</div>
+   </div>
+
+   <div class="price">
+    ${esc(p.price)}
+    <small>تومان</small>
+   </div>
+
+   <div class="info">
+
+    <div>📦 حجم: <b>${esc(p.volume||"-")}</b></div>
+
+    <div>⏱ مدت: <b>${esc(p.duration||"-")}</b></div>
+
+    ${p.locations
+      ? `<div class="locations">🌍 لوکیشن‌ها: ${esc(p.locations)}</div>`
+      : ""}
+
+    ${p.location
+      ? `<div>🌍 لوکیشن: ${esc(p.location)}</div>`
+      : ""}
+
+    ${p.protocol
+      ? `<div>🔐 پروتکل: ${esc(p.protocol)}</div>`
+      : ""}
+
+    ${p.tunnel
+      ? `<div>🔗 تونل: ${esc(p.tunnel)}</div>`
+      : ""}
+
+   </div>
+
+   <div class="desc">
+    ${esc(p.description||"")}
+   </div>
+
+  </article>
+
+ `).join("");
 }
 
 async function loadProducts(){
- const box=document.getElementById("productsBox");
+
  try{
   const r=await fetch("/api/products");
-  if(!r.ok)throw new Error();
-  const data=await r.json();
-  const list=(Array.isArray(data)?data:[]).filter(x=>x.active!==false);
-
-  if(!list.length){
-   box.innerHTML='<div class="empty">فعلاً محصولی موجود نیست.</div>';
-   return;
-  }
-
-  box.innerHTML=list.map(p=>`
-   <article class="product">
-    <h3>${esc(p.name||"محصول RZVPN")}</h3>
-    <div class="price">${esc(p.price||"تماس بگیرید")}</div>
-    <div class="infoRow">📦 حجم: ${esc(p.volume||"-")}</div>
-    <div class="infoRow">⏱ مدت: ${esc(p.duration||"-")}</div>
-    ${p.locations?`<div class="infoRow">🌍 لوکیشن‌ها: ${esc(p.locations)}</div>`:""}
-    ${p.tunnel?`<div class="infoRow">🚇 تونل: ${esc(p.tunnel)}</div>`:""}
-    ${p.protocol?`<div class="infoRow">🔐 پروتکل: ${esc(p.protocol)}</div>`:""}
-    <p class="desc">${esc(p.description||"")}</p>
-   </article>
-  `).join("");
+  products=await r.json();
+  render();
  }catch(e){
-  box.innerHTML='<div class="error">خطا در دریافت محصولات. صفحه را دوباره باز کنید.</div>';
+  document.getElementById("productsGrid").innerHTML=
+   '<div class="empty">خطا در دریافت محصولات.</div>';
  }
 }
-loadSettings();
+
+async function loadSettings(){
+
+ try{
+  const r=await fetch("/api/settings");
+  settings=await r.json();
+
+  document.getElementById("provider").textContent=
+   settings.provider||"ارائه‌دهنده خدمات RZVPN";
+
+  document.getElementById("baleChannel").textContent=
+   settings.baleChannel||"ثبت نشده";
+
+  document.getElementById("baleId").textContent=
+   settings.baleId||"ثبت نشده";
+
+  document.getElementById("instagram").textContent=
+   settings.instagram||"ثبت نشده";
+
+ }catch(e){
+  document.getElementById("provider").textContent="RZVPN";
+  document.getElementById("baleChannel").textContent="ثبت نشده";
+  document.getElementById("baleId").textContent="ثبت نشده";
+  document.getElementById("instagram").textContent="ثبت نشده";
+ }
+}
+
+document.getElementById("year").textContent=new Date().getFullYear();
+
 loadProducts();
+loadSettings();
 </script>
+
 </body>
 </html>
