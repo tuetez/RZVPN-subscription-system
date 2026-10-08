@@ -1,156 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RZVPN | قیمت‌ها</title>
-
+<title>لیست قیمت RZVPN</title>
+<meta name="theme-color" content="#060810">
 <style>
+*{box-sizing:border-box}
 body{
-margin:0;
-background:#070812;
-color:#fff;
-font-family:Tahoma,Arial;
+ margin:0;min-height:100vh;color:#fff;font-family:Tahoma,Arial,sans-serif;
+ background:
+ radial-gradient(circle at 20% 0%,#164d7650,transparent 32%),
+ radial-gradient(circle at 90% 20%,#632ba644,transparent 30%),#060810
 }
-header{
-text-align:center;
-padding:25px;
-background:#0d1020;
-border-bottom:1px solid #272d4b;
-}
-.logo{
-font-size:32px;
-font-weight:bold;
-color:#54b8ff;
-}
-.container{
-max-width:1000px;
-margin:auto;
-padding:25px 15px;
-}
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:18px;
-}
+.container{width:min(1100px,92%);margin:auto}
+header{padding:38px 0 25px;text-align:center}
+.logo{font-size:36px;font-weight:900}.logo span{color:#24bfff}
+.subtitle{color:#8f9bb1;margin-top:10px}
 .card{
-background:#111526;
-border:1px solid #29304e;
-border-radius:20px;
-padding:20px;
+ background:linear-gradient(145deg,#111827,#090d17);
+ border:1px solid #ffffff12;border-radius:22px;
+ box-shadow:0 18px 55px #0005
 }
-.price{
-font-size:27px;
-color:#55b7ff;
-font-weight:bold;
-margin:15px 0;
+.head{padding:25px;text-align:center;margin-bottom:18px}
+.head h1{margin:0;font-size:27px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.product{padding:22px;position:relative;overflow:hidden}
+.product:before{
+ content:"";position:absolute;top:0;right:0;left:0;height:2px;
+ background:linear-gradient(90deg,#17bfff,#8858ff)
 }
-.info{
-line-height:2;
-color:#c8cce0;
-}
-button{
-width:100%;
-padding:13px;
-border:0;
-border-radius:12px;
-background:#168cff;
-color:#fff;
-font-weight:bold;
-font-size:15px;
-margin-top:12px;
-cursor:pointer;
-}
-.empty{
-text-align:center;
-padding:50px;
-color:#999;
+.product h2{font-size:20px;margin:0 0 15px}
+.price{font-size:28px;color:#5ed3ff;font-weight:900;margin-bottom:15px}
+.row{padding:8px 0;border-bottom:1px solid #ffffff09;color:#c6d0df;font-size:14px}
+.desc{color:#909caf;line-height:1.9}
+.contact{margin:25px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.contactBox{padding:18px;text-align:center}
+.contactBox b{display:block;font-size:18px;margin-top:8px}
+.contactBox small{color:#8d98ab}
+.footer{text-align:center;color:#778297;padding:25px 0}
+.empty{text-align:center;padding:35px;color:#8e99ad}
+@media(max-width:800px){
+ .grid,.contact{grid-template-columns:1fr}
 }
 </style>
 </head>
-
 <body>
-
 <header>
-<div class="logo">RZVPN</div>
-<div>لیست پلن‌های موجود</div>
+ <div class="container">
+  <div class="logo">RZ<span>VPN</span></div>
+  <div class="subtitle" id="provider">ارائه‌دهنده خدمات RZVPN</div>
+ </div>
 </header>
 
-<div class="container">
+<main class="container">
+ <div class="card head">
+  <h1 id="title">💎 لیست قیمت‌ها</h1>
+  <div class="subtitle">پلن موردنظر خود را بررسی کنید</div>
+ </div>
 
-<div id="products" class="grid">
-<div class="empty">در حال بارگذاری...</div>
-</div>
+ <div id="products" class="grid">
+  <div class="card empty">در حال دریافت قیمت‌ها...</div>
+ </div>
 
-</div>
+ <section>
+  <div class="head card" style="margin-top:25px">
+   <h1>📞 ارتباط با ما</h1>
+  </div>
+  <div class="contact">
+   <div class="card contactBox"><small>📢 کانال بله</small><b id="baleChannel">—</b></div>
+   <div class="card contactBox"><small>👤 آیدی بله</small><b id="baleId">—</b></div>
+   <div class="card contactBox"><small>📸 اینستاگرام</small><b id="instagram">—</b></div>
+  </div>
+ </section>
+</main>
+
+<footer class="footer">© RZVPN — ارائه‌دهنده خدمات RZVPN</footer>
 
 <script>
-
-function esc(v){
-return String(v ?? "")
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
-}
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[m]));
 
 async function load(){
+ const parts=location.pathname.split("/").filter(Boolean);
+ const token=parts[1];
+ const box=document.getElementById("products");
 
-const token=location.pathname.split("/").pop();
+ if(!token){
+  box.innerHTML='<div class="card empty">لینک قیمت نامعتبر است.</div>';
+  return;
+ }
 
-try{
+ try{
+  const r=await fetch("/api/pricing/"+encodeURIComponent(token));
+  const data=await r.json();
 
-const res=await fetch("/api/pricing/"+encodeURIComponent(token));
-const data=await res.json();
+  if(!r.ok)throw new Error(data.error||"خطا");
 
-if(!res.ok)throw new Error(data.error);
+  document.getElementById("title").textContent=data.title||"💎 لیست قیمت‌ها";
 
-if(!data.products.length){
+  const products=data.products||data.items||[];
 
-document.getElementById("products").innerHTML=
-'<div class="empty">این لینک محصول فعالی ندارد.</div>';
+  if(!products.length){
+   box.innerHTML='<div class="card empty">محصولی برای نمایش وجود ندارد.</div>';
+   return;
+  }
 
-return;
+  box.innerHTML=products.map(p=>`
+   <article class="card product">
+    <h2>${esc(p.name||"محصول RZVPN")}</h2>
+    <div class="price">${esc(p.price||"تماس بگیرید")}</div>
+    <div class="row">📦 حجم: ${esc(p.volume||"-")}</div>
+    <div class="row">⏱ مدت: ${esc(p.duration||"-")}</div>
+    ${p.locations?`<div class="row">🌍 لوکیشن: ${esc(p.locations)}</div>`:""}
+    ${p.tunnel?`<div class="row">🚇 تونل: ${esc(p.tunnel)}</div>`:""}
+    ${p.protocol?`<div class="row">🔐 پروتکل: ${esc(p.protocol)}</div>`:""}
+    <p class="desc">${esc(p.description||"")}</p>
+   </article>
+  `).join("");
+ }catch(e){
+  box.innerHTML='<div class="card empty">لینک قیمت پیدا نشد یا منقضی شده است.</div>';
+ }
 }
 
-document.getElementById("products").innerHTML=
-data.products.map(p=>`
-
-<div class="card">
-
-<h2>${esc(p.name)}</h2>
-
-<div class="price">${esc(p.price || "تماس بگیرید")}</div>
-
-<div class="info">
-<div>📦 حجم: ${esc(p.volume || "-")}</div>
-<div>⏱ مدت: ${esc(p.duration || "-")}</div>
-<div>📍 لوکیشن: ${esc(p.location || "-")}</div>
-<div>🔐 پروتکل: ${esc(p.protocol || "-")}</div>
-<p>${esc(p.description || "")}</p>
-</div>
-
-<button onclick="location.href='/'">
-ثبت سفارش
-</button>
-
-</div>
-
-`).join("");
-
-}catch(e){
-
-document.getElementById("products").innerHTML=
-'<div class="empty">❌ این لینک وجود ندارد یا غیرفعال شده است.</div>';
-
+async function settings(){
+ try{
+  const r=await fetch("/api/settings");
+  if(!r.ok)return;
+  const s=await r.json();
+  document.getElementById("provider").textContent=s.provider||"ارائه‌دهنده خدمات RZVPN";
+  document.getElementById("baleChannel").textContent=s.baleChannel||"—";
+  document.getElementById("baleId").textContent=s.baleId||"—";
+  document.getElementById("instagram").textContent=s.instagram||"—";
+ }catch(e){}
 }
-
-}
-
-load();
-
+load();settings();
 </script>
-
 </body>
 </html>

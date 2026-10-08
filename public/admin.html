@@ -1,781 +1,459 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RZVPN | مدیریت</title>
-
+<title>RZVPN | پنل مدیریت</title>
+<meta name="theme-color" content="#060810">
 <style>
 *{box-sizing:border-box}
-
 body{
-margin:0;
-font-family:Tahoma,Arial;
-background:#070812;
-color:#fff;
+ margin:0;background:
+ radial-gradient(circle at 0 0,#123c5d55,transparent 30%),
+ radial-gradient(circle at 100% 10%,#59236b44,transparent 30%),#060810;
+ color:#f4f7ff;font-family:Tahoma,Arial,sans-serif
 }
-
-header{
-padding:20px;
-background:#0e1121;
-border-bottom:1px solid #292f4c;
+.container{width:min(1200px,94%);margin:auto}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.loginBox{
+ width:min(430px,100%);padding:32px;border-radius:25px;
+ background:#0d1321eF;border:1px solid #ffffff12;
+ box-shadow:0 25px 80px #0008;text-align:center
 }
-
-.logo{
-font-size:27px;
-font-weight:bold;
-color:#55b7ff;
-}
-
-.container{
-max-width:1200px;
-margin:auto;
-padding:20px 15px 50px;
-}
-
-.login{
-max-width:420px;
-margin:80px auto;
-background:#111526;
-border:1px solid #2c3353;
-border-radius:22px;
-padding:25px;
-}
-
-.panel{
-background:#101423;
-border:1px solid #282f4e;
-border-radius:20px;
-padding:20px;
-margin-bottom:20px;
-}
-
+.logo{font-size:35px;font-weight:900}.logo span{color:#20bfff}
 input,textarea,select{
-width:100%;
-background:#080a14;
-border:1px solid #303752;
-color:white;
-border-radius:11px;
-padding:12px;
-margin:6px 0 12px;
-font-family:inherit;
+ width:100%;padding:13px 14px;margin:6px 0 13px;
+ background:#080c15;color:#fff;border:1px solid #ffffff12;
+ border-radius:12px;outline:none;font-family:inherit
 }
-
-textarea{
-min-height:90px;
-resize:vertical;
-}
-
+input:focus,textarea:focus{border-color:#24bfff66;box-shadow:0 0 0 3px #24bfff0d}
 button{
-border:0;
-border-radius:11px;
-padding:11px 15px;
-background:#168cff;
-color:white;
-font-weight:bold;
-cursor:pointer;
-margin:4px;
+ border:0;border-radius:12px;padding:12px 16px;color:white;
+ background:linear-gradient(135deg,#08aef7,#7757f4);
+ cursor:pointer;font-family:inherit;font-weight:bold
 }
-
-button.red{background:#c93345}
-button.gray{background:#30364d}
-button.green{background:#168b50}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:15px;
+button.secondary{background:#ffffff0a;border:1px solid #ffffff12}
+button.danger{background:#ef4444}
+button.green{background:#16a34a}
+.top{
+ position:sticky;top:0;z-index:10;background:#060810e8;
+ backdrop-filter:blur(18px);border-bottom:1px solid #ffffff0d
 }
-
-.card{
-background:#15192a;
-border:1px solid #2b3150;
-border-radius:18px;
-padding:16px;
+.topin{height:70px;display:flex;align-items:center;justify-content:space-between}
+.layout{padding:25px 0 50px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat{
+ padding:18px;border:1px solid #ffffff10;border-radius:18px;
+ background:linear-gradient(145deg,#111827,#0a0f1b)
 }
-
-.card h3{
-margin-top:0;
-color:#65bdff;
+.stat b{font-size:26px;display:block;margin-top:5px;color:#5dd4ff}
+.section{
+ margin-top:18px;padding:22px;border-radius:20px;
+ background:#0d1320;border:1px solid #ffffff0d
 }
-
-.muted{
-color:#9298af;
-font-size:13px;
-line-height:1.9;
+.section h2{margin-top:0}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 14px}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.productList{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.product{
+ padding:17px;border-radius:17px;background:#080d17;
+ border:1px solid #ffffff0c
 }
-
-.badge{
-display:inline-block;
-padding:5px 9px;
-border-radius:20px;
-background:#174a31;
-color:#8dffb4;
-font-size:12px;
+.product.off{opacity:.5}
+.product h3{margin:0 0 10px}
+.price{font-size:22px;color:#5ed3ff;font-weight:bold}
+.meta{color:#9aa6ba;font-size:13px;line-height:2}
+.links{display:grid;gap:10px}
+.link{
+ padding:15px;border-radius:15px;background:#080d17;
+ border:1px solid #ffffff0c
 }
-
-.badge.off{
-background:#49202a;
-color:#ff9aaa;
+.linkurl{
+ display:block;margin:8px 0;color:#5dd4ff;word-break:break-all;font-size:13px
 }
-
-.hidden{
-display:none;
+.checks{
+ max-height:260px;overflow:auto;padding:8px;
+ border:1px solid #ffffff0c;border-radius:14px;background:#080d17
 }
-
-table{
-width:100%;
-border-collapse:collapse;
-overflow:hidden;
-}
-
-th,td{
-padding:10px;
-border-bottom:1px solid #292f49;
-text-align:right;
-vertical-align:top;
-}
-
-.order{
-margin-bottom:12px;
-padding:15px;
-border:1px solid #2b3150;
-border-radius:15px;
-background:#14182a;
-}
-
-.linkbox{
-padding:14px;
-background:#080b15;
-border-radius:13px;
-margin:10px 0;
-word-break:break-all;
+.check{display:flex;gap:10px;align-items:center;padding:9px;border-bottom:1px solid #ffffff08}
+.check input{width:auto;margin:0}
+.msg{margin-top:12px;padding:11px;border-radius:12px;display:none}
+.ok{background:#16a34a22;color:#76efaa}.err{background:#ef444422;color:#ff9292}
+@media(max-width:850px){
+ .stats,.productList{grid-template-columns:1fr}
+ .formgrid{grid-template-columns:1fr}
+ .full{grid-column:auto}
 }
 </style>
 </head>
-
 <body>
 
-<header>
-<div class="logo">RZVPN — مدیریت</div>
+<div id="login" class="login">
+ <div class="loginBox">
+  <div class="logo">RZ<span>VPN</span></div>
+  <p style="color:#929db0">پنل مدیریت حرفه‌ای</p>
+  <input id="password" type="password" placeholder="رمز مدیریت">
+  <button style="width:100%" onclick="login()">🔐 ورود به پنل</button>
+  <div id="loginMsg" class="msg err"></div>
+ </div>
+</div>
+
+<div id="app" style="display:none">
+<header class="top">
+ <div class="container topin">
+  <div class="logo">RZ<span>VPN</span></div>
+  <div class="actions">
+   <a href="/" target="_blank"><button class="secondary">🌐 سایت</button></a>
+   <button class="danger" onclick="logout()">خروج</button>
+  </div>
+ </div>
 </header>
 
-<div id="loginBox" class="login">
+<main class="container layout">
 
-<h2>ورود مدیر</h2>
-
-<p class="muted">
-برای ورود به پنل مدیریت رمز مدیر را وارد کنید.
-</p>
-
-<input id="password" type="password" placeholder="رمز مدیریت">
-
-<button onclick="login()">ورود به پنل</button>
-
-<p id="loginError"></p>
-
+<div class="stats">
+ <div class="stat">📦 محصولات فعال <b id="activeCount">0</b></div>
+ <div class="stat">💎 کل محصولات <b id="totalCount">0</b></div>
+ <div class="stat">🔗 لینک‌های قیمت <b id="linkCount">0</b></div>
 </div>
 
-<div id="app" class="container hidden">
+<section class="section">
+ <h2>➕ افزودن / ویرایش محصول</h2>
 
-<div class="panel">
+ <div class="formgrid">
+  <div>
+   <label>نام محصول</label>
+   <input id="name" placeholder="مثلاً #40 پاسارگاد">
+  </div>
+  <div>
+   <label>قیمت</label>
+   <input id="price" placeholder="337,500 تومان">
+  </div>
+  <div>
+   <label>حجم</label>
+   <input id="volume" placeholder="150GB">
+  </div>
+  <div>
+   <label>مدت</label>
+   <input id="duration" placeholder="30 روزه">
+  </div>
+  <div>
+   <label>لوکیشن</label>
+   <input id="location" placeholder="ترکیه">
+  </div>
+  <div>
+   <label>پروتکل</label>
+   <input id="protocol" placeholder="VLESS">
+  </div>
+  <div class="full">
+   <label>لوکیشن‌ها</label>
+   <input id="locations" placeholder="🇩🇪 🇫🇷 🇹🇷 🇵🇱">
+  </div>
+  <div class="full">
+   <label>تونل</label>
+   <input id="tunnel" placeholder="TUNEL IRAN 🇸🇪🇩🇪">
+  </div>
+  <div class="full">
+   <label>توضیحات</label>
+   <textarea id="description" rows="3"></textarea>
+  </div>
+ </div>
 
-<h2>➕ افزودن / ویرایش محصول</h2>
+ <div class="actions">
+  <button onclick="saveProduct()">💾 ذخیره محصول</button>
+  <button class="secondary" onclick="clearForm()">پاک کردن فرم</button>
+ </div>
+ <div id="productMsg" class="msg"></div>
+</section>
 
-<input type="hidden" id="editId">
+<section class="section">
+ <h2>📦 محصولات</h2>
+ <div id="productList" class="productList"></div>
+</section>
 
-<label>نام محصول</label>
-<input id="name" placeholder="مثلاً تک لوکیشن">
+<section class="section">
+ <h2>🔗 ساخت لینک لیست قیمت</h2>
+ <p style="color:#8e99ad">چند محصول را انتخاب کن تا یک لینک قیمت مشترک ساخته شود.</p>
 
-<label>قیمت</label>
-<input id="price" placeholder="مثلاً 150,000 تومان">
+ <input id="linkTitle" placeholder="عنوان لینک، مثلاً لیست قیمت مهر">
 
-<label>حجم</label>
-<input id="volume" placeholder="مثلاً 100 گیگ">
+ <div id="checks" class="checks"></div>
 
-<label>مدت</label>
-<input id="duration" placeholder="مثلاً 30 روز">
+ <br>
+ <button onclick="createLink()">🔗 ساخت لینک</button>
+ <div id="linkMsg" class="msg"></div>
+</section>
 
-<label>لوکیشن</label>
-<input id="location" placeholder="مثلاً ترکیه 🇹🇷">
+<section class="section">
+ <h2>🌐 لینک‌های قیمت ساخته‌شده</h2>
+ <div id="links" class="links"></div>
+</section>
 
-<label>پروتکل</label>
-<input id="protocol" placeholder="مثلاً WireGuard + Amnezia">
-
-<label>توضیحات</label>
-<textarea id="description"></textarea>
-
-<button onclick="saveProduct()">💾 ذخیره محصول</button>
-<button class="gray" onclick="clearForm()">پاک کردن فرم</button>
-
-</div>
-
-<div class="panel">
-
-<h2>📦 محصولات</h2>
-
-<div id="products" class="grid"></div>
-
-</div>
-
-<div class="panel">
-
-<h2>🔗 ساخت لینک عمومی قیمت</h2>
-
-<p class="muted">
-محصولات موردنظر را انتخاب کنید و یک لینک عمومی برای مشتری بسازید.
-</p>
-
-<div id="selectProducts"></div>
-
-<button onclick="createLink()">
-🔗 ساخت لینک
-</button>
-
-<div id="links"></div>
-
-</div>
-
-<div class="panel">
-
-<h2>🛒 سفارش‌های مشتریان</h2>
-
-<div id="orders">
-در حال دریافت سفارش‌ها...
-</div>
-
-</div>
-
+</main>
 </div>
 
 <script>
-
-let TOKEN="";
+let token=localStorage.getItem("rzvpn_admin_token")||"";
 let products=[];
+let editingId=null;
 
-function authHeaders(){
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[m]));
 
-return {
-"Content-Type":"application/json",
-"Authorization":"Bearer "+TOKEN
-};
+function headers(){
+ return {
+  "Content-Type":"application/json",
+  "Authorization":"Bearer "+token
+ };
+}
 
+async function api(url,opt={}){
+ opt.headers={...(opt.headers||{}),...headers()};
+ const r=await fetch(url,opt);
+ let data={};
+ try{data=await r.json()}catch(e){}
+ if(!r.ok)throw new Error(data.error||"خطا در ارتباط با سرور");
+ return data;
 }
 
 async function login(){
+ const pass=$("password").value.trim();
+ if(!pass)return;
 
-const password=document.getElementById("password").value;
+ try{
+  const r=await fetch("/api/admin/login",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({password:pass})
+  });
+  const d=await r.json();
 
-const res=await fetch("/api/admin/login",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({password})
-});
+  if(!r.ok)throw new Error(d.error||"رمز اشتباه است");
 
-const data=await res.json();
-
-if(!data.success){
-
-document.getElementById("loginError").textContent=
-"❌ "+data.error;
-
-return;
-
-}
-
-TOKEN=data.token;
-
-sessionStorage.setItem("rzvpn_admin_token",TOKEN);
-
-showApp();
-
-loadAll();
-
+  token=d.token||pass;
+  localStorage.setItem("rzvpn_admin_token",token);
+  showApp();
+ }catch(e){
+  $("loginMsg").textContent=e.message;
+  $("loginMsg").style.display="block";
+ }
 }
 
 function showApp(){
-
-document.getElementById("loginBox").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
-
-}
-
-async function loadAll(){
-
-await loadProducts();
-await loadLinks();
-await loadOrders();
-
-}
-
-async function loadProducts(){
-
-const res=await fetch("/api/admin/products",{
-headers:authHeaders()
-});
-
-if(res.status===401){
-logout();
-return;
-}
-
-products=await res.json();
-
-renderProducts();
-renderSelectProducts();
-
-}
-
-function renderProducts(){
-
-const box=document.getElementById("products");
-
-if(!products.length){
-
-box.innerHTML="<p>هنوز محصولی ساخته نشده است.</p>";
-
-return;
-
-}
-
-box.innerHTML=products.map(p=>`
-
-<div class="card">
-
-<h3>${esc(p.name)}</h3>
-
-<div class="muted">
-💰 ${esc(p.price || "-")}<br>
-📦 ${esc(p.volume || "-")}<br>
-⏱ ${esc(p.duration || "-")}<br>
-📍 ${esc(p.location || "-")}<br>
-🔐 ${esc(p.protocol || "-")}<br>
-${esc(p.description || "")}
-</div>
-
-<p>
-<span class="badge ${p.active===false?"off":""}">
-${p.active===false?"غیرفعال":"فعال"}
-</span>
-</p>
-
-<button onclick="editProduct('${p.id}')">✏️ ویرایش</button>
-
-<button class="gray"
-onclick="toggleProduct('${p.id}')">
-${p.active===false?"فعال کردن":"غیرفعال کردن"}
-</button>
-
-<button class="red"
-onclick="deleteProduct('${p.id}')">
-حذف
-</button>
-
-</div>
-
-`).join("");
-
-}
-
-function renderSelectProducts(){
-
-const box=document.getElementById("selectProducts");
-
-box.innerHTML=products
-.filter(p=>p.active!==false)
-.map(p=>`
-
-<label style="display:block;margin:10px 0">
-<input type="checkbox"
-class="productCheck"
-value="${p.id}"
-style="width:auto">
-${esc(p.name)} — ${esc(p.price || "")}
-</label>
-
-`).join("");
-
-}
-
-async function saveProduct(){
-
-const body={
-name:document.getElementById("name").value,
-price:document.getElementById("price").value,
-volume:document.getElementById("volume").value,
-duration:document.getElementById("duration").value,
-location:document.getElementById("location").value,
-protocol:document.getElementById("protocol").value,
-description:document.getElementById("description").value,
-active:true
-};
-
-const editId=document.getElementById("editId").value;
-
-let url="/api/admin/products";
-let method="POST";
-
-if(editId){
-
-url+="/"+editId;
-method="PUT";
-
-}
-
-const res=await fetch(url,{
-method,
-headers:authHeaders(),
-body:JSON.stringify(body)
-});
-
-const data=await res.json();
-
-if(!res.ok){
-
-alert(data.error || "خطا");
-
-return;
-
-}
-
-clearForm();
-await loadProducts();
-
-alert("محصول ذخیره شد.");
-
-}
-
-function editProduct(id){
-
-const p=products.find(x=>String(x.id)===String(id));
-
-if(!p)return;
-
-document.getElementById("editId").value=p.id;
-document.getElementById("name").value=p.name||"";
-document.getElementById("price").value=p.price||"";
-document.getElementById("volume").value=p.volume||"";
-document.getElementById("duration").value=p.duration||"";
-document.getElementById("location").value=p.location||"";
-document.getElementById("protocol").value=p.protocol||"";
-document.getElementById("description").value=p.description||"";
-
-window.scrollTo({top:0,behavior:"smooth"});
-
-}
-
-function clearForm(){
-
-[
-"editId",
-"name",
-"price",
-"volume",
-"duration",
-"location",
-"protocol",
-"description"
-].forEach(id=>{
-document.getElementById(id).value="";
-});
-
-}
-
-async function toggleProduct(id){
-
-await fetch("/api/admin/products/"+id+"/toggle",{
-method:"POST",
-headers:authHeaders()
-});
-
-loadProducts();
-
-}
-
-async function deleteProduct(id){
-
-if(!confirm("این محصول حذف شود؟"))return;
-
-await fetch("/api/admin/products/"+id,{
-method:"DELETE",
-headers:authHeaders()
-});
-
-loadProducts();
-
-}
-
-async function createLink(){
-
-const ids=[...document.querySelectorAll(".productCheck:checked")]
-.map(x=>x.value);
-
-if(!ids.length){
-
-alert("حداقل یک محصول انتخاب کنید.");
-
-return;
-
-}
-
-const res=await fetch("/api/pricing-links",{
-method:"POST",
-headers:authHeaders(),
-body:JSON.stringify({productIds:ids})
-});
-
-const data=await res.json();
-
-if(!res.ok){
-
-alert(data.error);
-
-return;
-
-}
-
-const full=location.origin+data.url;
-
-alert("لینک ساخته شد:\n\n"+full);
-
-await loadLinks();
-
-}
-
-async function loadLinks(){
-
-const res=await fetch("/api/pricing-links",{
-headers:authHeaders()
-});
-
-if(!res.ok)return;
-
-const links=await res.json();
-
-const box=document.getElementById("links");
-
-if(!links.length){
-
-box.innerHTML="<p>هنوز لینکی ساخته نشده است.</p>";
-
-return;
-
-}
-
-box.innerHTML=links.map(l=>{
-
-const url=location.origin+"/pricing/"+l.token;
-
-const names=l.productIds.map(id=>{
-const p=products.find(x=>String(x.id)===String(id));
-return p?p.name:"محصول حذف‌شده";
-});
-
-return `
-
-<div class="linkbox">
-
-<b>${names.map(esc).join("، ")}</b>
-
-<br><br>
-
-<a href="${url}" target="_blank" style="color:#55b7ff">
-${url}
-</a>
-
-<br><br>
-
-<span class="badge ${l.active===false?"off":""}">
-${l.active===false?"غیرفعال":"فعال"}
-</span>
-
-<br>
-
-<button onclick="copyText('${url}')">
-📋 کپی لینک
-</button>
-
-<button class="gray"
-onclick="toggleLink('${l.token}')">
-${l.active===false?"فعال کردن":"غیرفعال کردن"}
-</button>
-
-<button class="red"
-onclick="deleteLink('${l.token}')">
-حذف
-</button>
-
-</div>
-
-`;
-
-}).join("");
-
-}
-
-async function toggleLink(token){
-
-await fetch("/api/pricing-links/"+token+"/toggle",{
-method:"POST",
-headers:authHeaders()
-});
-
-loadLinks();
-
-}
-
-async function deleteLink(token){
-
-if(!confirm("این لینک حذف شود؟"))return;
-
-await fetch("/api/pricing-links/"+token,{
-method:"DELETE",
-headers:authHeaders()
-});
-
-loadLinks();
-
-}
-
-async function copyText(text){
-
-await navigator.clipboard.writeText(text);
-
-alert("لینک کپی شد.");
-
-}
-
-async function loadOrders(){
-
-const res=await fetch("/api/admin/orders",{
-headers:authHeaders()
-});
-
-if(!res.ok)return;
-
-const orders=await res.json();
-
-const box=document.getElementById("orders");
-
-if(!orders.length){
-
-box.innerHTML="<p>هنوز سفارشی ثبت نشده است.</p>";
-
-return;
-
-}
-
-box.innerHTML=orders.map(o=>`
-
-<div class="order">
-
-<b>👤 ${esc(o.customerName)}</b>
-
-<div class="muted">
-
-📦 محصول: ${esc(o.productName)}<br>
-💰 قیمت: ${esc(o.productPrice || "-")}<br>
-📞 تماس: ${esc(o.contact)}<br>
-📝 توضیح: ${esc(o.note || "-")}<br>
-🕐 ${new Date(o.createdAt).toLocaleString("fa-IR")}
-
-</div>
-
-<select onchange="changeOrderStatus('${o.id}',this.value)">
-
-${[
-"جدید",
-"در حال بررسی",
-"تکمیل شده",
-"لغو شده"
-].map(s=>`
-
-<option ${o.status===s?"selected":""}>
-${s}
-</option>
-
-`).join("")}
-
-</select>
-
-<button class="red"
-onclick="deleteOrder('${o.id}')">
-حذف سفارش
-</button>
-
-</div>
-
-`).join("");
-
-}
-
-async function changeOrderStatus(id,status){
-
-await fetch("/api/admin/orders/"+id+"/status",{
-method:"POST",
-headers:authHeaders(),
-body:JSON.stringify({status})
-});
-
-loadOrders();
-
-}
-
-async function deleteOrder(id){
-
-if(!confirm("سفارش حذف شود؟"))return;
-
-await fetch("/api/admin/orders/"+id,{
-method:"DELETE",
-headers:authHeaders()
-});
-
-loadOrders();
-
+ $("login").style.display="none";
+ $("app").style.display="block";
+ loadAll();
 }
 
 function logout(){
-
-sessionStorage.removeItem("rzvpn_admin_token");
-location.reload();
-
+ localStorage.removeItem("rzvpn_admin_token");
+ location.reload();
 }
 
-function esc(v){
-
-return String(v ?? "")
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
-
+async function loadAll(){
+ await loadProducts();
+ await loadLinks();
 }
 
-TOKEN=sessionStorage.getItem("rzvpn_admin_token")||"";
-
-if(TOKEN){
-
-fetch("/api/admin/check",{
-headers:authHeaders()
-}).then(res=>{
-
-if(res.ok){
-
-showApp();
-loadAll();
-
-}else{
-
-logout();
-
+async function loadProducts(){
+ try{
+  products=await api("/api/products");
+  if(!Array.isArray(products))products=[];
+  renderProducts();
+  renderChecks();
+  $("totalCount").textContent=products.length;
+  $("activeCount").textContent=products.filter(p=>p.active!==false).length;
+ }catch(e){
+  $("productList").innerHTML='<div class="msg err" style="display:block">جلسه مدیریت منقضی شده یا دسترسی ندارید.</div>';
+ }
 }
 
-});
-
+function renderProducts(){
+ $("productList").innerHTML=products.length?products.map(p=>`
+  <div class="product ${p.active===false?"off":""}">
+   <h3>${esc(p.name)}</h3>
+   <div class="price">${esc(p.price||"-")}</div>
+   <div class="meta">
+    📦 ${esc(p.volume||"-")}<br>
+    ⏱ ${esc(p.duration||"-")}<br>
+    ${p.locations?"🌍 "+esc(p.locations)+"<br>":""}
+    ${p.protocol?"🔐 "+esc(p.protocol)+"<br>":""}
+    وضعیت: ${p.active===false?"غیرفعال":"فعال"}
+   </div>
+   <div class="actions" style="margin-top:10px">
+    <button onclick="editProduct('${esc(p.id)}')">✏️ ویرایش</button>
+    <button class="secondary" onclick="toggleProduct('${esc(p.id)}')">
+     ${p.active===false?"فعال‌سازی":"غیرفعال‌سازی"}
+    </button>
+    <button class="danger" onclick="deleteProduct('${esc(p.id)}')">🗑 حذف</button>
+   </div>
+  </div>
+ `).join(""):'<div class="msg" style="display:block">محصولی وجود ندارد.</div>';
 }
 
+function renderChecks(){
+ $("checks").innerHTML=products.filter(p=>p.active!==false).map(p=>`
+  <label class="check">
+   <input type="checkbox" value="${esc(p.id)}">
+   <span><b>${esc(p.name)}</b> — ${esc(p.volume||"")} — ${esc(p.price||"")}</span>
+  </label>
+ `).join("")||'<div style="padding:12px;color:#8994a8">محصول فعال وجود ندارد.</div>';
+}
+
+function fill(id,value){
+ $(id).value=value??"";
+}
+
+function editProduct(id){
+ const p=products.find(x=>x.id===id);
+ if(!p)return;
+ editingId=id;
+ fill("name",p.name);fill("price",p.price);fill("volume",p.volume);
+ fill("duration",p.duration);fill("location",p.location);
+ fill("protocol",p.protocol);fill("locations",p.locations);
+ fill("tunnel",p.tunnel);fill("description",p.description);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function clearForm(){
+ editingId=null;
+ ["name","price","volume","duration","location","protocol","locations","tunnel","description"].forEach(x=>fill(x,""));
+}
+
+async function saveProduct(){
+ const body={
+  name:$("name").value.trim(),
+  price:$("price").value.trim(),
+  volume:$("volume").value.trim(),
+  duration:$("duration").value.trim(),
+  location:$("location").value.trim(),
+  protocol:$("protocol").value.trim(),
+  locations:$("locations").value.trim(),
+  tunnel:$("tunnel").value.trim(),
+  description:$("description").value.trim()
+ };
+
+ if(!body.name){
+  show("productMsg","نام محصول را وارد کن","err");return;
+ }
+
+ try{
+  if(editingId){
+   await api("/api/products/"+encodeURIComponent(editingId),{
+    method:"PUT",body:JSON.stringify(body)
+   });
+   show("productMsg","محصول با موفقیت ویرایش شد","ok");
+  }else{
+   await api("/api/products",{
+    method:"POST",body:JSON.stringify(body)
+   });
+   show("productMsg","محصول با موفقیت اضافه شد","ok");
+  }
+  clearForm();
+  await loadProducts();
+ }catch(e){show("productMsg",e.message,"err")}
+}
+
+async function toggleProduct(id){
+ try{
+  const p=products.find(x=>x.id===id);
+  await api("/api/products/"+encodeURIComponent(id),{
+   method:"PUT",body:JSON.stringify({...p,active:p.active===false})
+  });
+  loadProducts();
+ }catch(e){alert(e.message)}
+}
+
+async function deleteProduct(id){
+ if(!confirm("این محصول حذف شود؟"))return;
+ try{
+  await api("/api/products/"+encodeURIComponent(id),{method:"DELETE"});
+  loadProducts();
+ }catch(e){alert(e.message)}
+}
+
+async function createLink(){
+ const ids=[...document.querySelectorAll("#checks input:checked")].map(x=>x.value);
+ if(!ids.length){show("linkMsg","حداقل یک محصول انتخاب کن","err");return}
+
+ try{
+  const d=await api("/api/pricing-links",{
+   method:"POST",
+   body:JSON.stringify({
+    title:$("linkTitle").value.trim()||"لیست قیمت RZVPN",
+    productIds:ids
+   })
+  });
+  $("linkTitle").value="";
+  document.querySelectorAll("#checks input").forEach(x=>x.checked=false);
+  show("linkMsg","لینک با موفقیت ساخته شد","ok");
+  await loadLinks();
+ }catch(e){show("linkMsg",e.message,"err")}
+}
+
+async function loadLinks(){
+ try{
+  const links=await api("/api/pricing-links");
+  $("linkCount").textContent=Array.isArray(links)?links.length:0;
+
+  $("links").innerHTML=Array.isArray(links)&&links.length?links.map(x=>{
+   const url=location.origin+"/pricing/"+encodeURIComponent(x.token);
+   return `
+    <div class="link">
+     <b>🔗 ${esc(x.title||"لیست قیمت")}</b>
+     <span class="linkurl">${esc(url)}</span>
+     <div class="actions">
+      <button onclick="copyText('${esc(url)}')">📋 کپی لینک</button>
+      <button class="secondary" onclick="window.open('${esc(url)}','_blank')">🌐 مشاهده</button>
+      <button class="secondary" onclick="toggleLink('${esc(x.token)}')">
+       ${x.active===false?"فعال‌سازی":"غیرفعال‌سازی"}
+      </button>
+      <button class="danger" onclick="deleteLink('${esc(x.token)}')">🗑 حذف</button>
+     </div>
+    </div>
+   `;
+  }).join(""):'<div style="color:#8d98ab">هنوز لینک قیمتی ساخته نشده.</div>';
+ }catch(e){
+  $("links").innerHTML='<div style="color:#ff9292">خطا در دریافت لینک‌ها</div>';
+ }
+}
+
+async function toggleLink(t){
+ try{
+  await api("/api/pricing-links/"+encodeURIComponent(t)+"/toggle",{method:"POST"});
+  loadLinks();
+ }catch(e){alert(e.message)}
+}
+
+async function deleteLink(t){
+ if(!confirm("این لینک حذف شود؟"))return;
+ try{
+  await api("/api/pricing-links/"+encodeURIComponent(t),{method:"DELETE"});
+  loadLinks();
+ }catch(e){alert(e.message)}
+}
+
+async function copyText(t){
+ try{
+  await navigator.clipboard.writeText(t);
+  alert("لینک کپی شد ✅");
+ }catch(e){
+  prompt("لینک:",t);
+ }
+}
+
+function show(id,text,type){
+ const x=$(id);
+ x.textContent=text;
+ x.className="msg "+type;
+ x.style.display="block";
+ setTimeout(()=>x.style.display="none",3500);
+}
+
+if(token)showApp();
 </script>
-
 </body>
 </html>

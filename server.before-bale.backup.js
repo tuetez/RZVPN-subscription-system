@@ -1201,7 +1201,3 @@ app.listen(
     console.log("");
   }
 );
-
-
-// Start RZVPN Bale Bot together with website
-require("./bale-bot");

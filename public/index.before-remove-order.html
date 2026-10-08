@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RZVPN</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Tahoma,Arial,sans-serif;
+ background:#07111f;
+ color:#fff;
+}
+.container{
+ max-width:1100px;
+ margin:auto;
+ padding:20px;
+}
+.hero{
+ padding:35px 20px;
+ text-align:center;
+ background:linear-gradient(135deg,#101d33,#07111f);
+ border-bottom:1px solid #20304a;
+}
+.logo{
+ font-size:38px;
+ font-weight:900;
+ color:#4ade80;
+}
+.provider{
+ margin-top:10px;
+ color:#b9c7da;
+}
+.card{
+ background:#101d30;
+ border:1px solid #263953;
+ border-radius:20px;
+ padding:20px;
+ margin:20px 0;
+ box-shadow:0 10px 30px #0004;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+ gap:16px;
+}
+.product{
+ background:#0b1728;
+ border:1px solid #293c58;
+ border-radius:18px;
+ padding:18px;
+}
+.price{
+ font-size:25px;
+ font-weight:bold;
+ color:#4ade80;
+ margin:12px 0;
+}
+button{
+ border:0;
+ border-radius:12px;
+ padding:13px 18px;
+ cursor:pointer;
+ font-weight:bold;
+ font-size:15px;
+}
+.buy{
+ width:100%;
+ background:#4ade80;
+ color:#04100a;
+}
+input,textarea{
+ width:100%;
+ padding:13px;
+ margin-top:7px;
+ margin-bottom:12px;
+ border-radius:12px;
+ border:1px solid #344b69;
+ background:#07111f;
+ color:#fff;
+}
+label{
+ display:block;
+ margin-top:10px;
+ color:#dce6f4;
+}
+.info{
+ line-height:2;
+ color:#b9c7da;
+}
+footer{
+ text-align:center;
+ padding:30px;
+ color:#8fa3bd;
+}
+a{color:#4ade80}
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+ <div class="logo">RZVPN</div>
+ <div class="provider" id="provider">
+  ارائه‌دهنده خدمات RZVPN
+ </div>
+</section>
+
+<div class="container">
+
+<div class="card">
+ <h2>🚀 پلن‌های RZVPN</h2>
+ <div id="products" class="grid">
+  در حال دریافت محصولات...
+ </div>
+</div>
+
+<div class="card" id="orderBox">
+ <h2>🛒 ثبت سفارش</h2>
+
+ <form id="orderForm">
+
+ <label>محصول انتخاب‌شده</label>
+ <input id="selectedProduct" readonly>
+
+ <input id="productId" type="hidden">
+
+ <label>نام مشتری</label>
+ <input id="customerName"
+ placeholder="نام شما">
+
+ <label>شماره تماس</label>
+ <input id="customerPhone"
+ placeholder="شماره تماس">
+
+ <label>📢 کانال بله</label>
+ <input id="baleChannel"
+ placeholder="لینک کانال بله در صورت نیاز">
+
+ <label>👤 آیدی بله</label>
+ <input id="baleId"
+ placeholder="@username">
+
+ <label>📸 پیج اینستاگرام</label>
+ <input id="instagram"
+ placeholder="@instagram">
+
+ <label>توضیحات سفارش</label>
+ <textarea id="note"
+ rows="4"
+ placeholder="توضیحات خود را بنویسید"></textarea>
+
+ <button class="buy" type="submit">
+ ثبت سفارش
+ </button>
+
+ </form>
+
+ <div id="orderResult"></div>
+</div>
+
+<div class="card">
+ <h2>📞 ارتباط با ما</h2>
+
+ <div class="info">
+ <div id="baleChannelInfo"></div>
+ <div id="baleIdInfo"></div>
+ <div id="instagramInfo"></div>
+ </div>
+</div>
+
+</div>
+
+<footer>
+ ارائه‌دهنده خدمات RZVPN
+</footer>
+
+<script>
+
+let settings = {};
+
+async function loadSettings(){
+
+ const r = await fetch("/api/settings");
+ settings = await r.json();
+
+ document.getElementById("provider").textContent =
+  settings.provider || "ارائه‌دهنده خدمات RZVPN";
+
+ document.getElementById("baleChannelInfo").innerHTML =
+  settings.baleChannel
+   ? "📢 کانال بله: " + settings.baleChannel
+   : "";
+
+ document.getElementById("baleIdInfo").innerHTML =
+  settings.baleId
+   ? "👤 آیدی بله: " + settings.baleId
+   : "";
+
+ document.getElementById("instagramInfo").innerHTML =
+  settings.instagram
+   ? "📸 اینستاگرام: " + settings.instagram
+   : "";
+}
+
+async function loadProducts(){
+
+ const box =
+  document.getElementById("products");
+
+ try{
+
+  const r = await fetch("/api/products");
+  const products = await r.json();
+
+  const active =
+   products.filter(p => p.active !== false);
+
+  if(!active.length){
+   box.innerHTML =
+    "<p>فعلاً محصولی موجود نیست.</p>";
+   return;
+  }
+
+  box.innerHTML =
+   active.map(p => `
+
+    <div class="product">
+
+      <h3>${escapeHTML(p.name)}</h3>
+
+      <div class="price">
+       ${escapeHTML(p.price)}
+      </div>
+
+      <div>📦 حجم: ${escapeHTML(p.volume || "-")}</div>
+
+      <div>⏱ مدت: ${escapeHTML(p.duration || "-")}</div>
+
+      ${
+       p.location
+       ? `<div>🌍 لوکیشن: ${escapeHTML(p.location)}</div>`
+       : ""
+      }
+
+      ${
+       p.protocol
+       ? `<div>🔐 پروتکل: ${escapeHTML(p.protocol)}</div>`
+       : ""
+      }
+
+      <p>
+       ${escapeHTML(p.description || "")}
+      </p>
+
+      <button
+       class="buy"
+       onclick='selectProduct(${JSON.stringify(p)})'>
+       🛒 انتخاب و ثبت سفارش
+      </button>
+
+    </div>
+
+   `).join("");
+
+ }catch(e){
+
+  box.innerHTML =
+   "<p>خطا در دریافت محصولات</p>";
+ }
+}
+
+function selectProduct(p){
+
+ document.getElementById("productId").value =
+  p.id;
+
+ document.getElementById("selectedProduct").value =
+  p.name + " - " + p.price;
+
+ document.getElementById("orderBox")
+  .scrollIntoView({
+   behavior:"smooth"
+  });
+}
+
+document.getElementById("orderForm")
+.addEventListener("submit", async e => {
+
+ e.preventDefault();
+
+ const productId =
+  document.getElementById("productId").value;
+
+ if(!productId){
+
+  alert("ابتدا یک محصول انتخاب کنید");
+  return;
+ }
+
+ const data = {
+
+  productId,
+
+  customerName:
+   document.getElementById("customerName").value,
+
+  customerPhone:
+   document.getElementById("customerPhone").value,
+
+  baleChannel:
+   document.getElementById("baleChannel").value,
+
+  baleId:
+   document.getElementById("baleId").value,
+
+  instagram:
+   document.getElementById("instagram").value,
+
+  note:
+   document.getElementById("note").value
+ };
+
+ const result =
+  document.getElementById("orderResult");
+
+ try{
+
+  const r = await fetch(
+   "/api/orders",
+   {
+    method:"POST",
+    headers:{
+     "Content-Type":"application/json"
+    },
+    body:JSON.stringify(data)
+   }
+  );
+
+  const out = await r.json();
+
+  if(!r.ok){
+   throw new Error(
+    out.error || "خطا"
+   );
+  }
+
+  result.innerHTML = `
+   <div class="card">
+    <h3>✅ سفارش ثبت شد</h3>
+    <p>
+     شماره سفارش:
+     <b>${escapeHTML(out.order.id)}</b>
+    </p>
+    <p>
+     سفارش شما با موفقیت ثبت شد.
+    </p>
+   </div>
+  `;
+
+  e.target.reset();
+
+ }catch(err){
+
+  result.innerHTML =
+   `<p style="color:#ff7777">
+    ❌ ${escapeHTML(err.message)}
+   </p>`;
+ }
+});
+
+function escapeHTML(value){
+
+ return String(value ?? "")
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+}
+
+loadSettings();
+loadProducts();
+
+</script>
+
+</body>
+</html>

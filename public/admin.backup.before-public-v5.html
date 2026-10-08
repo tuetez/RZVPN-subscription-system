@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت RZVPN</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:#070e18;
+color:#fff;
+min-height:100vh;
+padding:15px
+}
+
+.wrap{
+width:min(1100px,100%);
+margin:auto
+}
+
+.header{
+background:linear-gradient(135deg,#102640,#0b1728);
+border:1px solid #233e5c;
+border-radius:22px;
+padding:22px;
+margin-bottom:16px
+}
+
+.logo{
+font-size:32px;
+font-weight:900
+}
+
+.logo span{color:#4da1ff}
+
+.subtitle{
+color:#91a8c0;
+margin-top:6px
+}
+
+.nav{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:18px
+}
+
+.nav button{
+width:auto;
+margin:0
+}
+
+button{
+border:0;
+border-radius:12px;
+padding:12px 16px;
+background:#2475c8;
+color:white;
+font-weight:800;
+cursor:pointer
+}
+
+button.secondary{
+background:#17283d
+}
+
+button.danger{
+background:#a93645
+}
+
+button.success{
+background:#198754
+}
+
+.panel{
+background:#0e1a2a;
+border:1px solid #223a55;
+border-radius:20px;
+padding:20px;
+margin-bottom:16px
+}
+
+h2{
+margin-top:0
+}
+
+.form{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:7px
+}
+
+.field.full{
+grid-column:1/-1
+}
+
+label{
+font-size:13px;
+color:#9eb2c8
+}
+
+input,textarea,select{
+width:100%;
+border:1px solid #29445f;
+background:#081321;
+color:#fff;
+border-radius:11px;
+padding:12px;
+font-family:inherit;
+outline:none
+}
+
+textarea{
+min-height:90px;
+resize:vertical
+}
+
+.actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:15px
+}
+
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:14px
+}
+
+.card{
+background:#0a1523;
+border:1px solid #233d58;
+border-radius:18px;
+padding:17px
+}
+
+.card.off{
+opacity:.55
+}
+
+.cardHead{
+display:flex;
+justify-content:space-between;
+gap:10px
+}
+
+.card h3{
+margin:0
+}
+
+.badge{
+font-size:11px;
+padding:6px 9px;
+border-radius:20px;
+background:#123f2a;
+color:#70e4a8
+}
+
+.badge.off{
+background:#402028;
+color:#ff9ca8
+}
+
+.meta{
+display:flex;
+flex-wrap:wrap;
+gap:7px;
+margin:13px 0
+}
+
+.meta span{
+font-size:11px;
+padding:7px 9px;
+background:#111f30;
+border-radius:8px;
+color:#aebfd0
+}
+
+.desc{
+color:#aebed0;
+font-size:13px;
+line-height:1.8;
+min-height:45px
+}
+
+.cardActions{
+display:flex;
+gap:7px;
+margin-top:14px
+}
+
+.cardActions button{
+flex:1;
+font-size:12px
+}
+
+.selectRow{
+display:flex;
+gap:10px;
+align-items:flex-start;
+padding:10px;
+border:1px solid #20374f;
+border-radius:12px;
+margin-bottom:7px;
+background:#0a1523
+}
+
+.selectRow input{
+width:20px;
+height:20px;
+margin-top:2px
+}
+
+.selectInfo{
+flex:1
+}
+
+.selectName{
+font-weight:800
+}
+
+.selectPrice{
+font-size:12px;
+color:#8fa9c2;
+margin-top:4px
+}
+
+.links{
+display:flex;
+flex-direction:column;
+gap:10px
+}
+
+.linkCard{
+background:#0a1523;
+border:1px solid #243e59;
+border-radius:15px;
+padding:14px
+}
+
+.linkUrl{
+direction:ltr;
+text-align:left;
+background:#07101b;
+padding:10px;
+border-radius:9px;
+font-size:12px;
+overflow:auto;
+margin:9px 0
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-bottom:16px
+}
+
+.stat{
+background:#0b1726;
+border:1px solid #203852;
+border-radius:15px;
+padding:15px;
+text-align:center
+}
+
+.stat b{
+display:block;
+font-size:25px;
+margin-bottom:4px
+}
+
+#message{
+position:fixed;
+left:15px;
+bottom:15px;
+padding:13px 17px;
+background:#14283e;
+border:1px solid #315273;
+border-radius:12px;
+display:none;
+z-index:10
+}
+
+@media(max-width:650px){
+.form{
+grid-template-columns:1fr
+}
+.field.full{
+grid-column:auto
+}
+.stats{
+grid-template-columns:1fr 1fr 1fr
+}
+}
+
+@media(max-width:430px){
+body{padding:9px}
+.panel{padding:14px}
+.stats{
+gap:5px
+}
+.stat{
+padding:10px 5px;
+font-size:11px
+}
+.stat b{
+font-size:20px
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="header">
+<div class="logo">RZ<span>VPN</span> Admin</div>
+<div class="subtitle">مدیریت محصولات، قیمت‌ها و لینک‌های فروش</div>
+
+<div class="nav">
+<button onclick="showSection('productsSection')">📦 محصولات</button>
+<button class="secondary" onclick="showSection('addSection')">➕ محصول جدید</button>
+<button class="secondary" onclick="showSection('linksSection')">🔗 لینک‌های قیمت</button>
+<button class="secondary" onclick="window.open('/', '_blank')">🌐 سایت</button>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat">
+<b id="countAll">0</b>
+محصول
+</div>
+<div class="stat">
+<b id="countActive">0</b>
+فعال
+</div>
+<div class="stat">
+<b id="countLinks">0</b>
+لینک
+</div>
+</div>
+
+<section id="addSection" class="panel">
+
+<h2 id="formTitle">➕ افزودن محصول</h2>
+
+<input type="hidden" id="editId">
+
+<div class="form">
+
+<div class="field">
+<label>نام محصول</label>
+<input id="name" placeholder="مثلاً تک لوکیشن">
+</div>
+
+<div class="field">
+<label>قیمت</label>
+<input id="price" placeholder="مثلاً 150000">
+</div>
+
+<div class="field">
+<label>حجم</label>
+<input id="volume" placeholder="مثلاً 50 گیگ">
+</div>
+
+<div class="field">
+<label>مدت اعتبار</label>
+<input id="duration" placeholder="مثلاً 30 روز">
+</div>
+
+<div class="field">
+<label>لوکیشن</label>
+<input id="location" placeholder="مثلاً ترکیه 🇹🇷">
+</div>
+
+<div class="field">
+<label>پروتکل</label>
+<input id="protocol" placeholder="مثلاً WireGuard + Amnezia">
+</div>
+
+<div class="field full">
+<label>توضیحات</label>
+<textarea id="description" placeholder="توضیحات محصول..."></textarea>
+</div>
+
+</div>
+
+<div class="actions">
+<button onclick="saveProduct()">💾 ذخیره محصول</button>
+<button class="secondary" onclick="clearForm()">پاک کردن فرم</button>
+</div>
+
+</section>
+
+<section id="productsSection" class="panel">
+
+<h2>📦 محصولات</h2>
+
+<div id="products" class="products">
+در حال بارگذاری...
+</div>
+
+</section>
+
+<section id="linksSection" class="panel">
+
+<h2>🔗 ساخت لینک قیمت</h2>
+
+<p style="color:#91a8c0">
+چند محصول را انتخاب کن و برای همه آنها یک لینک عمومی بساز.
+</p>
+
+<div id="selectProducts"></div>
+
+<div class="actions">
+<button onclick="createPricingLink()">🔗 ساخت لینک برای انتخاب‌شده‌ها</button>
+</div>
+
+<hr style="border-color:#20364f;margin:25px 0">
+
+<h2>لینک‌های ساخته‌شده</h2>
+
+<div id="links" class="links">
+در حال بارگذاری...
+</div>
+
+</section>
+
+</div>
+
+<div id="message"></div>
+
+<script>
+
+let products=[];
+
+let links=[];
+
+function message(text){
+const box=document.getElementById("message");
+box.textContent=text;
+box.style.display="block";
+
+setTimeout(()=>{
+box.style.display="none";
+},2500);
+}
+
+function showSection(id){
+document.getElementById(id).scrollIntoView({
+behavior:"smooth"
+});
+}
+
+async function loadProducts(){
+
+const res=await fetch("/api/products");
+
+products=await res.json();
+
+renderProducts();
+
+renderSelectProducts();
+
+updateStats();
+}
+
+async function loadLinks(){
+
+const res=await fetch("/api/pricing-links");
+
+links=await res.json();
+
+renderLinks();
+
+updateStats();
+}
+
+function updateStats(){
+
+document.getElementById("countAll").textContent=products.length;
+
+document.getElementById("countActive").textContent=
+products.filter(p=>p.active!==false).length;
+
+document.getElementById("countLinks").textContent=links.length;
+}
+
+function renderProducts(){
+
+const box=document.getElementById("products");
+
+if(!products.length){
+
+box.innerHTML="<div>هنوز محصولی ساخته نشده است.</div>";
+
+return;
+}
+
+box.innerHTML=products.map(p=>`
+
+<div class="card ${p.active===false?"off":""}">
+
+<div class="cardHead">
+
+<h3>${esc(p.name)}</h3>
+
+<span class="badge ${p.active===false?"off":""}">
+${p.active===false?"غیرفعال":"فعال"}
+</span>
+
+</div>
+
+<div class="meta">
+
+<span>💰 ${esc(p.price||"-")}</span>
+<span>📦 ${esc(p.volume||"-")}</span>
+<span>⏱️ ${esc(p.duration||"-")}</span>
+<span>📍 ${esc(p.location||"-")}</span>
+<span>📡 ${esc(p.protocol||"-")}</span>
+
+</div>
+
+<div class="desc">
+${esc(p.description||"بدون توضیحات")}
+</div>
+
+<div class="cardActions">
+
+<button onclick="editProduct('${p.id}')">
+✏️ ویرایش
+</button>
+
+<button class="secondary" onclick="toggleProduct('${p.id}')">
+${p.active===false?"🟢 فعال":"🔴 غیرفعال"}
+</button>
+
+<button class="danger" onclick="deleteProduct('${p.id}')">
+🗑️ حذف
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+}
+
+function renderSelectProducts(){
+
+const box=document.getElementById("selectProducts");
+
+const active=products.filter(p=>p.active!==false);
+
+if(!active.length){
+
+box.innerHTML="<p>محصول فعال وجود ندارد.</p>";
+
+return;
+}
+
+box.innerHTML=active.map(p=>`
+
+<label class="selectRow">
+
+<input type="checkbox" value="${p.id}" class="productCheck">
+
+<div class="selectInfo">
+
+<div class="selectName">
+${esc(p.name)}
+</div>
+
+<div class="selectPrice">
+${esc(p.price||"بدون قیمت")} تومان •
+${esc(p.volume||"بدون حجم")} •
+${esc(p.duration||"بدون مدت")}
+</div>
+
+</div>
+
+</label>
+
+`).join("");
+}
+
+function renderLinks(){
+
+const box=document.getElementById("links");
+
+if(!links.length){
+
+box.innerHTML="<p>هنوز لینک قیمتی ساخته نشده است.</p>";
+
+return;
+}
+
+const base=location.origin;
+
+box.innerHTML=links.slice().reverse().map(link=>{
+
+const names=link.productIds.map(id=>{
+
+const p=products.find(x=>x.id===id);
+
+return p ? p.name : "محصول حذف‌شده";
+
+}).join("، ");
+
+const url=base+"/pricing/"+link.token;
+
+return `
+
+<div class="linkCard">
+
+<b>${link.active===false?"🔴 غیرفعال":"🟢 فعال"}</b>
+
+<div style="margin-top:7px;color:#aabdd0">
+محصولات: ${esc(names)}
+</div>
+
+<div class="linkUrl">
+${esc(url)}
+</div>
+
+<div class="actions">
+
+<button onclick="copyText('${url}')">
+📋 کپی لینک
+</button>
+
+<button class="secondary"
+onclick="window.open('${url}','_blank')">
+👁️ مشاهده
+</button>
+
+<button class="secondary"
+onclick="toggleLink('${link.token}')">
+${link.active===false?"فعال کردن":"غیرفعال کردن"}
+</button>
+
+<button class="danger"
+onclick="deleteLink('${link.token}')">
+🗑️ حذف
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}).join("");
+}
+
+async function saveProduct(){
+
+const editId=document.getElementById("editId").value;
+
+const data={
+name:document.getElementById("name").value.trim(),
+price:document.getElementById("price").value.trim(),
+volume:document.getElementById("volume").value.trim(),
+duration:document.getElementById("duration").value.trim(),
+location:document.getElementById("location").value.trim(),
+protocol:document.getElementById("protocol").value.trim(),
+description:document.getElementById("description").value.trim(),
+active:true
+};
+
+if(!data.name){
+
+alert("نام محصول را وارد کن.");
+
+return;
+}
+
+const url=editId
+?"/api/products/"+editId
+:"/api/products";
+
+const method=editId?"PUT":"POST";
+
+const res=await fetch(url,{
+method,
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(data)
+});
+
+const result=await res.json();
+
+if(!res.ok){
+
+alert(result.error||"خطا");
+
+return;
+}
+
+message(editId?"محصول ویرایش شد":"محصول اضافه شد");
+
+clearForm();
+
+await loadProducts();
+
+}
+
+function editProduct(id){
+
+const p=products.find(x=>x.id===id);
+
+if(!p)return;
+
+document.getElementById("editId").value=p.id;
+
+document.getElementById("name").value=p.name||"";
+document.getElementById("price").value=p.price||"";
+document.getElementById("volume").value=p.volume||"";
+document.getElementById("duration").value=p.duration||"";
+document.getElementById("location").value=p.location||"";
+document.getElementById("protocol").value=p.protocol||"";
+document.getElementById("description").value=p.description||"";
+
+document.getElementById("formTitle").textContent="✏️ ویرایش محصول";
+
+showSection("addSection");
+}
+
+function clearForm(){
+
+document.getElementById("editId").value="";
+
+[
+"name",
+"price",
+"volume",
+"duration",
+"location",
+"protocol",
+"description"
+].forEach(id=>{
+document.getElementById(id).value="";
+});
+
+document.getElementById("formTitle").textContent="➕ افزودن محصول";
+}
+
+async function toggleProduct(id){
+
+const p=products.find(x=>x.id===id);
+
+if(!p)return;
+
+const res=await fetch("/api/products/"+id,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+...p,
+active:p.active===false
+})
+});
+
+if(res.ok){
+
+message("وضعیت محصول تغییر کرد");
+
+await loadProducts();
+
+}
+}
+
+async function deleteProduct(id){
+
+if(!confirm("این محصول حذف شود؟"))return;
+
+const res=await fetch("/api/products/"+id,{
+method:"DELETE"
+});
+
+if(res.ok){
+
+message("محصول حذف شد");
+
+await loadProducts();
+
+await loadLinks();
+
+}
+}
+
+async function createPricingLink(){
+
+const checks=[
+...document.querySelectorAll(".productCheck:checked")
+];
+
+const productIds=checks.map(x=>x.value);
+
+if(!productIds.length){
+
+alert("حداقل یک محصول را انتخاب کن.");
+
+return;
+}
+
+const res=await fetch("/api/pricing-links",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({productIds})
+});
+
+const data=await res.json();
+
+if(!res.ok){
+
+alert(data.error||"خطا");
+
+return;
+}
+
+message("لینک ساخته شد");
+
+document.querySelectorAll(".productCheck")
+.forEach(x=>x.checked=false);
+
+await loadLinks();
+
+showSection("linksSection");
+
+}
+
+async function toggleLink(token){
+
+const res=await fetch(
+"/api/pricing-links/"+token+"/toggle",
+{
+method:"POST"
+});
+
+if(res.ok){
+
+message("وضعیت لینک تغییر کرد");
+
+await loadLinks();
+
+}
+}
+
+async function deleteLink(token){
+
+if(!confirm("این لینک حذف شود؟"))return;
+
+const res=await fetch(
+"/api/pricing-links/"+token,
+{
+method:"DELETE"
+});
+
+if(res.ok){
+
+message("لینک حذف شد");
+
+await loadLinks();
+
+}
+}
+
+async function copyText(text){
+
+try{
+
+await navigator.clipboard.writeText(text);
+
+message("لینک کپی شد");
+
+}catch(e){
+
+prompt("لینک را کپی کن:",text);
+
+}
+}
+
+function esc(value){
+
+return String(value??"")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
+
+(async function(){
+
+await loadProducts();
+
+await loadLinks();
+
+})();
+
+</script>
+
+</body>
+</html>

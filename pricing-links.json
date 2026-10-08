@@ -1,24 +1,18 @@
 [
   {
-    "token": "7c3e744b591f92735bbb83d049f6a6c94d7e",
+    "token": "e5f3a36fb6d1566a4cfdd6f9",
+    "name": "لیست قیمت RZVPN",
     "productIds": [
+      "pasargad-150",
       "rebecca-150",
       "rebecca-200",
       "rebecca-300",
-      "rebecca-400"
-    ],
-    "createdAt": "2026-10-04T14:22:54.851Z",
-    "active": true
-  },
-  {
-    "token": "42b35d549dbd2c8e173a2734e1994faed459",
-    "productIds": [
-      "pasargad-150",
+      "rebecca-400",
       "pasargad-200",
       "pasargad-300",
       "pasargad-500"
     ],
-    "createdAt": "2026-10-04T14:24:24.549Z",
-    "active": true
+    "active": true,
+    "createdAt": "2026-10-06T11:14:50.679Z"
   }
 ]

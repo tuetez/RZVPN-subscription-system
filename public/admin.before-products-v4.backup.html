@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>مدیریت RZVPN</title>
+
+<style>
+
+*{
+ box-sizing:border-box;
+}
+
+body{
+ margin:0;
+ background:#070b13;
+ color:#fff;
+ font-family:Tahoma,Arial,sans-serif;
+}
+
+.container{
+ width:min(1100px,94%);
+ margin:20px auto 50px;
+}
+
+.header{
+ background:#111827;
+ border:1px solid #263449;
+ border-radius:22px;
+ padding:22px;
+ margin-bottom:18px;
+}
+
+.logo{
+ font-size:30px;
+ font-weight:900;
+}
+
+.muted{
+ color:#94a3b8;
+ margin-top:7px;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:
+ repeat(auto-fit,minmax(280px,1fr));
+ gap:18px;
+}
+
+.card{
+ background:#111827;
+ border:1px solid #263449;
+ border-radius:20px;
+ padding:20px;
+}
+
+h2{
+ margin-top:0;
+}
+
+input,
+textarea{
+ width:100%;
+ background:#0b1220;
+ color:#fff;
+ border:1px solid #334155;
+ border-radius:12px;
+ padding:13px;
+ margin:7px 0;
+ font-family:inherit;
+}
+
+textarea{
+ min-height:85px;
+}
+
+button{
+ border:0;
+ border-radius:12px;
+ padding:12px 15px;
+ cursor:pointer;
+ font-family:inherit;
+ font-weight:900;
+ margin:4px;
+ background:#2563eb;
+ color:#fff;
+}
+
+button.gray{
+ background:#475569;
+}
+
+button.danger{
+ background:#dc2626;
+}
+
+.product{
+ border:1px solid #29364b;
+ border-radius:16px;
+ padding:15px;
+ margin:10px 0;
+ background:#0c1320;
+}
+
+.select-product{
+ display:flex;
+ align-items:flex-start;
+ gap:12px;
+ cursor:pointer;
+}
+
+.select-product input{
+ width:22px;
+ height:22px;
+ margin:2px 0 0;
+ accent-color:#2563eb;
+}
+
+.product-name{
+ font-size:18px;
+ font-weight:900;
+}
+
+.price{
+ color:#60a5fa;
+ font-size:20px;
+ font-weight:900;
+ margin:7px 0;
+}
+
+.small{
+ color:#94a3b8;
+ font-size:13px;
+ line-height:1.8;
+}
+
+.linkbox{
+ background:#020617;
+ padding:11px;
+ border-radius:10px;
+ word-break:break-all;
+ font-size:12px;
+ margin:8px 0;
+}
+
+.status{
+ color:#22c55e;
+ font-weight:900;
+}
+
+.status.off{
+ color:#ef4444;
+}
+
+.selected-count{
+ display:inline-block;
+ background:#172554;
+ color:#93c5fd;
+ padding:7px 12px;
+ border-radius:999px;
+ font-size:13px;
+ font-weight:900;
+ margin-bottom:10px;
+}
+
+@media(max-width:600px){
+ .container{
+   width:94%;
+   margin-top:12px;
+ }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<div class="logo">
+RZVPN ⚡
+</div>
+
+<div class="muted">
+پنل مدیریت قیمت‌ها و لینک‌های گروهی
+</div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>➕ افزودن پلن</h2>
+
+<input id="name" placeholder="نام پلن">
+
+<input id="price"
+placeholder="قیمت مثال: 150,000 تومان">
+
+<input id="volume"
+placeholder="حجم مثال: 100 گیگ">
+
+<input id="duration"
+placeholder="مدت مثال: 30 روز">
+
+<textarea
+id="description"
+placeholder="توضیحات پلن"></textarea>
+
+<button onclick="addProduct()">
+افزودن پلن
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>📊 آمار</h2>
+
+<div id="stats">
+در حال بارگذاری...
+</div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>📦 انتخاب پلن‌ها برای یک لینک</h2>
+
+<div class="selected-count">
+انتخاب شده: <span id="selectedCount">0</span>
+</div>
+
+<br>
+
+<button onclick="selectAll()">
+☑️ انتخاب همه
+</button>
+
+<button class="gray" onclick="clearAll()">
+❌ لغو انتخاب
+</button>
+
+<button onclick="createGroupLink()">
+🔗 ساخت یک لینک برای پلن‌های انتخاب‌شده
+</button>
+
+<div id="products">
+در حال بارگذاری...
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>🔗 لینک‌های گروهی</h2>
+
+<div id="pricingLinks">
+در حال بارگذاری...
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>📋 لینک‌های اشتراک تکی</h2>
+
+<div id="subscriptions">
+در حال بارگذاری...
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let products = [];
+
+async function load(){
+
+ const p =
+   await fetch("/api/products");
+
+ products = await p.json();
+
+ renderProducts();
+
+ const s =
+   await fetch("/api/subscriptions");
+
+ const subs =
+   await s.json();
+
+ renderSubscriptions(subs);
+
+ const l =
+   await fetch("/api/pricing-links");
+
+ const links =
+   await l.json();
+
+ renderPricingLinks(links);
+
+ updateStats(links,subs);
+}
+
+function esc(v){
+
+ return String(v ?? "")
+ .replace(/&/g,"&amp;")
+ .replace(/</g,"&lt;")
+ .replace(/>/g,"&gt;")
+ .replace(/"/g,"&quot;");
+
+}
+
+function updateStats(links,subs){
+
+ document.getElementById("stats").innerHTML = `
+ <div>📦 تعداد پلن‌ها:
+ <b>${products.length}</b>
+ </div>
+ <br>
+ <div>🔗 لینک‌های گروهی:
+ <b>${links.length}</b>
+ </div>
+ <br>
+ <div>👤 اشتراک‌های تکی:
+ <b>${subs.length}</b>
+ </div>
+ `;
+
+}
+
+function renderProducts(){
+
+ const box =
+   document.getElementById("products");
+
+ if(!products.length){
+
+   box.innerHTML =
+     "هنوز پلنی ساخته نشده است.";
+
+   return;
+ }
+
+ box.innerHTML =
+ products.map(p => `
+
+ <div class="product">
+
+ <label class="select-product">
+
+ <input
+ type="checkbox"
+ class="product-check"
+ value="${esc(p.id)}"
+ onchange="updateSelectedCount()"
+ ${p.active === false ? "disabled":""}
+ >
+
+ <div>
+
+ <div class="product-name">
+ ${esc(p.name)}
+ </div>
+
+ <div class="price">
+ ${esc(p.price)}
+ </div>
+
+ <div class="small">
+ 📦 ${esc(p.volume)}
+ <br>
+ ⏱ ${esc(p.duration)}
+ <br>
+ ${esc(p.description)}
+ </div>
+
+ <div class="small">
+
+ وضعیت:
+
+ <span class="${p.active === false
+ ? "status off"
+ : "status"}">
+
+ ${p.active === false
+ ? "غیرفعال"
+ : "فعال"}
+
+ </span>
+
+ </div>
+
+ </div>
+
+ </label>
+
+ <br>
+
+ <button onclick="editProduct('${p.id}')">
+ ✏️ ویرایش
+ </button>
+
+ <button
+ class="gray"
+ onclick="createSingleLink('${p.id}')">
+
+ 🔗 لینک تکی
+
+ </button>
+
+ <button
+ class="danger"
+ onclick="deleteProduct('${p.id}')">
+
+ 🗑 حذف
+ </button>
+
+ </div>
+
+ `).join("");
+
+ updateSelectedCount();
+
+}
+
+function getSelected(){
+
+ return [...document.querySelectorAll(
+   ".product-check:checked"
+ )].map(x => x.value);
+
+}
+
+function updateSelectedCount(){
+
+ document.getElementById(
+   "selectedCount"
+ ).textContent = getSelected().length;
+
+}
+
+function selectAll(){
+
+ document.querySelectorAll(
+   ".product-check:not(:disabled)"
+ ).forEach(x => x.checked = true);
+
+ updateSelectedCount();
+
+}
+
+function clearAll(){
+
+ document.querySelectorAll(
+   ".product-check"
+ ).forEach(x => x.checked = false);
+
+ updateSelectedCount();
+
+}
+
+async function createGroupLink(){
+
+ const ids = getSelected();
+
+ if(ids.length < 2){
+
+   alert(
+     "حداقل ۲ پلن را انتخاب کنید."
+   );
+
+   return;
+ }
+
+ const r =
+   await fetch("/api/pricing-links",{
+     method:"POST",
+     headers:{
+       "Content-Type":"application/json"
+     },
+     body:JSON.stringify({
+       productIds:ids
+     })
+   });
+
+ const data =
+   await r.json();
+
+ if(!r.ok){
+
+   alert(
+     data.error || "خطا"
+   );
+
+   return;
+ }
+
+ prompt(
+   "✅ لینک گروهی ساخته شد.\\n\\nاین یک لینک شامل تمام پلن‌های انتخاب‌شده است:",
+   data.link
+ );
+
+ clearAll();
+
+ load();
+
+}
+
+function renderPricingLinks(links){
+
+ const box =
+   document.getElementById(
+     "pricingLinks"
+   );
+
+ if(!links.length){
+
+   box.innerHTML =
+     "هنوز لینک گروهی ساخته نشده است.";
+
+   return;
+ }
+
+ box.innerHTML =
+ links.map(l => {
+
+ const base =
+   location.origin;
+
+ const url =
+   `${base}/pricing/${l.token}`;
+
+ const names =
+   l.products
+    .map(p => p.name)
+    .join(" • ");
+
+ return `
+
+ <div class="product">
+
+ <b>🔗 لینک گروهی</b>
+
+ <div class="small">
+ ${esc(names)}
+ </div>
+
+ <div class="linkbox">
+ ${esc(url)}
+ </div>
+
+ <button onclick="copyText('${url}')">
+ 📋 کپی لینک
+ </button>
+
+ <button
+ class="gray"
+ onclick="window.open('${url}','_blank')">
+
+ 👁 مشاهده
+ </button>
+
+ <button
+ onclick="toggleGroup('${l.token}')">
+
+ ${l.active
+   ? "⛔ غیرفعال"
+   : "✅ فعال"}
+
+ </button>
+
+ <button
+ class="danger"
+ onclick="deleteGroup('${l.token}')">
+
+ 🗑 حذف
+
+ </button>
+
+ </div>
+
+ `;
+
+ }).join("");
+
+}
+
+async function addProduct(){
+
+ const data = {
+
+ name:
+ document.getElementById("name")
+ .value.trim(),
+
+ price:
+ document.getElementById("price")
+ .value.trim(),
+
+ volume:
+ document.getElementById("volume")
+ .value.trim(),
+
+ duration:
+ document.getElementById("duration")
+ .value.trim(),
+
+ description:
+ document.getElementById("description")
+ .value.trim()
+
+ };
+
+ if(
+   !data.name ||
+   !data.price ||
+   !data.volume ||
+   !data.duration
+ ){
+
+   alert(
+     "نام، قیمت، حجم و مدت را وارد کنید."
+   );
+
+   return;
+ }
+
+ const r =
+   await fetch("/api/products",{
+
+     method:"POST",
+
+     headers:{
+       "Content-Type":
+       "application/json"
+     },
+
+     body:JSON.stringify(data)
+
+   });
+
+ const result =
+   await r.json();
+
+ if(!r.ok){
+
+   alert(
+     result.error || "خطا"
+   );
+
+   return;
+ }
+
+ document.getElementById("name").value="";
+ document.getElementById("price").value="";
+ document.getElementById("volume").value="";
+ document.getElementById("duration").value="";
+ document.getElementById("description").value="";
+
+ alert("پلن اضافه شد ✅");
+
+ load();
+
+}
+
+async function editProduct(id){
+
+ const p =
+   products.find(x => x.id === id);
+
+ if(!p) return;
+
+ const name =
+   prompt("نام پلن:",p.name);
+
+ if(name === null) return;
+
+ const price =
+   prompt("قیمت:",p.price);
+
+ if(price === null) return;
+
+ const volume =
+   prompt("حجم:",p.volume);
+
+ if(volume === null) return;
+
+ const duration =
+   prompt("مدت:",p.duration);
+
+ if(duration === null) return;
+
+ const description =
+   prompt(
+     "توضیحات:",
+     p.description || ""
+   );
+
+ if(description === null) return;
+
+ const r =
+   await fetch(
+     "/api/products/"+id,
+     {
+       method:"PUT",
+       headers:{
+         "Content-Type":
+         "application/json"
+       },
+       body:JSON.stringify({
+         name,
+         price,
+         volume,
+         duration,
+         description
+       })
+     }
+   );
+
+ if(r.ok){
+
+   alert("ویرایش شد ✅");
+
+   load();
+
+ }else{
+
+   alert("خطا در ویرایش");
+
+ }
+
+}
+
+async function deleteProduct(id){
+
+ if(!confirm(
+   "این پلن حذف شود؟"
+ )) return;
+
+ const r =
+   await fetch(
+     "/api/products/"+id,
+     {method:"DELETE"}
+   );
+
+ if(r.ok){
+
+   load();
+
+ }else{
+
+   alert("خطا در حذف");
+
+ }
+
+}
+
+async function createSingleLink(id){
+
+ const r =
+   await fetch(
+     "/api/subscription",
+     {
+       method:"POST",
+       headers:{
+         "Content-Type":
+         "application/json"
+       },
+       body:JSON.stringify({
+         productId:id
+       })
+     }
+   );
+
+ const data =
+   await r.json();
+
+ if(!r.ok){
+
+   alert(
+     data.error || "خطا"
+   );
+
+   return;
+ }
+
+ prompt(
+   "لینک اشتراک ساخته شد:",
+   data.link
+ );
+
+ load();
+
+}
+
+function renderSubscriptions(subs){
+
+ const box =
+   document.getElementById(
+     "subscriptions"
+   );
+
+ if(!subs.length){
+
+   box.innerHTML =
+     "هنوز اشتراک تکی وجود ندارد.";
+
+   return;
+ }
+
+ box.innerHTML =
+ subs.map(s => {
+
+ const url =
+   `${location.origin}/sub/${s.token}`;
+
+ return `
+
+ <div class="product">
+
+ <b>${esc(s.productName)}</b>
+
+ <div class="small">
+ وضعیت:
+ <span class="${
+   s.active
+   ? "status"
+   : "status off"
+ }">
+
+ ${
+   s.active
+   ? "فعال"
+   : "غیرفعال"
+ }
+
+ </span>
+ </div>
+
+ <div class="linkbox">
+ ${esc(url)}
+ </div>
+
+ <button
+ onclick="copyText('${url}')">
+
+ 📋 کپی
+
+ </button>
+
+ <button
+ class="gray"
+ onclick="window.open('${url}','_blank')">
+
+ 👁 مشاهده
+
+ </button>
+
+ <button
+ onclick="toggleSingle('${s.token}')">
+
+ ${s.active
+   ? "⛔ غیرفعال"
+   : "✅ فعال"}
+
+ </button>
+
+ <button
+ class="danger"
+ onclick="deleteSingle('${s.token}')">
+
+ 🗑 حذف
+
+ </button>
+
+ </div>
+
+ `;
+
+ }).join("");
+
+}
+
+async function toggleGroup(token){
+
+ await fetch(
+   "/api/pricing-links/"+token+"/toggle",
+   {method:"POST"}
+ );
+
+ load();
+
+}
+
+async function deleteGroup(token){
+
+ if(!confirm(
+   "این لینک گروهی حذف شود؟"
+ )) return;
+
+ await fetch(
+   "/api/pricing-links/"+token,
+   {method:"DELETE"}
+ );
+
+ load();
+
+}
+
+async function toggleSingle(token){
+
+ await fetch(
+   "/api/subscription/"+token+"/toggle",
+   {method:"POST"}
+ );
+
+ load();
+
+}
+
+async function deleteSingle(token){
+
+ if(!confirm(
+   "این لینک حذف شود؟"
+ )) return;
+
+ await fetch(
+   "/api/subscription/"+token,
+   {method:"DELETE"}
+ );
+
+ load();
+
+}
+
+async function copyText(text){
+
+ try{
+
+   await navigator.clipboard
+     .writeText(text);
+
+   alert("کپی شد ✅");
+
+ }catch(e){
+
+   prompt(
+     "لینک را کپی کنید:",
+     text
+   );
+
+ }
+
+}
+
+load();
+
+</script>
+
+</body>
+
+</html>

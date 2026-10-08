@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>قیمت‌های RZVPN</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#07111f;
+ color:#fff;
+ font-family:Tahoma,Arial;
+}
+.container{
+ max-width:1100px;
+ margin:auto;
+ padding:20px;
+}
+.hero{
+ text-align:center;
+ padding:35px 10px;
+}
+.logo{
+ font-size:38px;
+ font-weight:900;
+ color:#4ade80;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+ gap:18px;
+}
+.card{
+ background:#101d30;
+ border:1px solid #293b56;
+ border-radius:20px;
+ padding:20px;
+ box-shadow:0 10px 30px #0005;
+}
+.price{
+ font-size:25px;
+ color:#4ade80;
+ font-weight:bold;
+ margin:15px 0;
+}
+button{
+ width:100%;
+ padding:13px;
+ border:0;
+ border-radius:12px;
+ background:#4ade80;
+ font-weight:bold;
+}
+input,textarea{
+ width:100%;
+ padding:13px;
+ margin:7px 0 12px;
+ border-radius:12px;
+ border:1px solid #344b69;
+ background:#07111f;
+ color:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="hero">
+ <div class="logo">RZVPN</div>
+ <p id="provider">
+  ارائه‌دهنده خدمات RZVPN
+ </p>
+</div>
+
+<div id="title"></div>
+
+<div id="products" class="grid">
+ در حال دریافت...
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h2>🛒 ثبت سفارش</h2>
+
+
+
+<div id="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const token =
+ location.pathname.split("/").pop();
+
+let selected = null;
+
+async function load(){
+
+ try{
+
+  const r =
+   await fetch("/api/pricing/" + token);
+
+  const data =
+   await r.json();
+
+  if(!r.ok)
+   throw new Error(data.error);
+
+  document.getElementById("title")
+   .innerHTML =
+   `<div class="card">
+    <h2>${esc(data.link.name)}</h2>
+   </div>`;
+
+  document.getElementById("products")
+   .innerHTML =
+   data.products.map(p => `
+
+    <div class="card">
+
+      <h2>${esc(p.name)}</h2>
+
+      <div class="price">
+       ${esc(p.price)}
+      </div>
+
+      <div>📦 ${esc(p.volume || "")}</div>
+      <div>⏱ ${esc(p.duration || "")}</div>
+
+      ${
+       p.location
+       ? `<div>🌍 ${esc(p.location)}</div>`
+       : ""
+      }
+
+      ${
+       p.protocol
+       ? `<div>🔐 ${esc(p.protocol)}</div>`
+       : ""
+      }
+
+      <p>
+       ${esc(p.description || "")}
+      </p>
+
+      <button
+       onclick='choose(${JSON.stringify(p)})'>
+       انتخاب این پلن
+      </button>
+
+    </div>
+
+   `).join("");
+
+ }catch(e){
+
+  document.getElementById("products")
+   .innerHTML =
+   `<div class="card">
+    ❌ ${esc(e.message)}
+   </div>`;
+ }
+}
+
+function choose(p){
+
+ selected = p;
+
+ document.getElementById("productId").value =
+  p.id;
+
+ document.getElementById("productName").value =
+  p.name + " - " + p.price;
+
+ window.scrollTo({
+  top:document.body.scrollHeight,
+  behavior:"smooth"
+ });
+}
+
+document.getElementById("form")
+.addEventListener("submit", async e => {
+
+ e.preventDefault();
+
+ if(!selected){
+  alert("یک پلن انتخاب کنید");
+  return;
+ }
+
+ const data = {
+
+  productId:selected.id,
+
+  customerName:
+   document.getElementById("customerName").value,
+
+  customerPhone:
+   document.getElementById("customerPhone").value,
+
+  baleChannel:
+   document.getElementById("baleChannel").value,
+
+  baleId:
+   document.getElementById("baleId").value,
+
+  instagram:
+   document.getElementById("instagram").value,
+
+  note:
+   document.getElementById("note").value
+ };
+
+ try{
+
+  const r =
+   await fetch(
+    "/api/orders",
+    {
+     method:"POST",
+     headers:{
+      "Content-Type":"application/json"
+     },
+     body:JSON.stringify(data)
+    }
+   );
+
+  const out =
+   await r.json();
+
+  if(!r.ok)
+   throw new Error(
+    out.error || "خطا"
+   );
+
+  document.getElementById("result")
+   .innerHTML =
+   `<div class="card">
+    <h3>✅ سفارش ثبت شد</h3>
+    <p>
+     شماره سفارش:
+     <b>${esc(out.order.id)}</b>
+    </p>
+   </div>`;
+
+  e.target.reset();
+
+ }catch(err){
+
+  document.getElementById("result")
+   .innerHTML =
+   `<p style="color:#ff7777">
+    ❌ ${esc(err.message)}
+   </p>`;
+ }
+});
+
+function esc(v){
+
+ return String(v ?? "")
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+}
+
+load();
+
+</script>
+
+</body>
+</html>
